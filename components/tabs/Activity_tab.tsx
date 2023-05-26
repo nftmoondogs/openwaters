@@ -23,11 +23,11 @@ const Activity_tab = ({
       >
         <div
           role="table"
-          className="w-full overflow-y-auto text-sm bg-white border rounded-lg rounded-tl-none scrollbar-custom dark:bg-jacarta-700 dark:border-jacarta-600 border-jacarta-100 max-h-72 dark:text-white"
+          className="overflow-y-auto text-sm bg-white border rounded-lg rounded-tl-none scrollbar-custom dark:bg-jacarta-700 dark:border-jacarta-600 border-jacarta-100 max-h-72 dark:text-white"
           id="scrollableDiv"
         >
           <div
-            className="sticky top-0 flex dark:bg-jacarta-600 bg-light-base w-"
+            className="sticky top-0 flex dark:bg-jacarta-600 bg-light-base w-full"
             role="row"
           >
             <div
@@ -82,7 +82,7 @@ const Activity_tab = ({
               role="columnheader"
             >
               <span className="w-full overflow-hidden text-jacarta-700 dark:text-jacarta-100 text-ellipsis">
-                Transaction
+                View
               </span>
             </div>
           </div>
@@ -101,7 +101,7 @@ const Activity_tab = ({
                 createdAt,
               } = item;
               return (
-                <div className="flex" role="row" key={id}>
+                <div className="flex w-full" role="row" key={id}>
                   <div
                     className={`dark:border-jacarta-600 border-jacarta-100 flex items-center border-t py-4 px-4 ${
                       showItems ? "w-1/12" : "w-1/6"

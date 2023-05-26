@@ -40,7 +40,7 @@ const OnSale = () => {
             next={fetchMore}
             hasMore={onSaleNfts.length < count}
           >
-            <div className="grid grid-cols-1 gap-[30px] md:grid-cols-3 lg:grid-cols-4">
+            <div className="grid grid-cols-2 gap-1 md:gap-[30px] md:grid-cols-3 lg:grid-cols-4">
               {onSaleNfts.map((nft, index) => {
                 return <NftCard nft={nft} key={index} />;
               })}

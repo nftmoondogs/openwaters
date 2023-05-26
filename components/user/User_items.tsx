@@ -162,7 +162,7 @@ const User_items = ({ userAddress }: { userAddress: string }) => {
                     next={fetchMoreNfts}
                     hasMore={userNfts.length < nftCount}
                   >
-                    <div className="grid grid-cols-1 gap-[30px] md:grid-cols-3 lg:grid-cols-4">
+                    <div className="grid grid-cols-2 gap-1 md:gap-[30px] md:grid-cols-3 lg:grid-cols-4">
                       {userNfts.map((nft, index) => (
                         <NftCard nft={nft} key={index} />
                       ))}
@@ -183,7 +183,7 @@ const User_items = ({ userAddress }: { userAddress: string }) => {
                 next={fetchMoreCollections}
                 hasMore={userCollections.length < collectionCount}
               >
-                <div className="grid grid-cols-1 gap-[30px] md:grid-cols-3 lg:grid-cols-4">
+                <div className="grid grid-cols-2 gap-1 md:gap-[30px] md:grid-cols-3 lg:grid-cols-4">
                   {userCollections.map((collection, index) => {
                     return (
                       <CollectionCard collection={collection} key={index} />

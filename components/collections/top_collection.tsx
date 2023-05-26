@@ -1,11 +1,11 @@
 /* eslint-disable @next/next/no-img-element */
 import React from "react";
+import Link from "next/link";
 
 import HeadLine from "../headLine";
 import CollectionCard from "../CollectionCard";
 
-const Top_collection = ({collections}: {collections: Collection[]}) => {
-
+const Top_collection = ({ collections }: { collections: Collection[] }) => {
   return (
     <div>
       <section className="relative py-24 dark:bg-jacarta-800">
@@ -26,7 +26,7 @@ const Top_collection = ({collections}: {collections: Collection[]}) => {
             />
           </div>
 
-          <div className="grid grid-cols-1 gap-3 md:grid-cols-2 md:gap-[30px] lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-1 md:gap-[30px] md:grid-cols-3 lg:grid-cols-4">
             {collections.length > 0 ? (
               collections.map((collection, index) => {
                 return <CollectionCard collection={collection} key={index} />;
@@ -35,6 +35,13 @@ const Top_collection = ({collections}: {collections: Collection[]}) => {
               <></>
             )}
           </div>
+          <Link href="/collection">
+            <div
+              className={`px-8 py-3 mt-5 mx-auto font-semibold text-center text-white transition-all rounded-full bg-accent shadow-accent-volume hover:bg-accent-dark cursor-pointer w-fit`}
+            >
+              See More
+            </div>
+          </Link>
         </div>
       </section>
     </div>

@@ -61,7 +61,7 @@ const Explore_collection = () => {
               next={fetchMore}
               hasMore={allCollections.length < count}
             >
-              <div className="grid grid-cols-1 gap-[30px] md:grid-cols-3 lg:grid-cols-4">
+              <div className="grid grid-cols-2 gap-1 md:gap-[30px] md:grid-cols-3 lg:grid-cols-4">
                 {allCollections.map((collection, index) => {
                   return <CollectionCard collection={collection} key={index} />;
                 })}

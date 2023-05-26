@@ -22,7 +22,7 @@ import { MARKETPLACE_CONTRACT_ADDRESS, CHAIN_ID } from "../../config/env";
 
 const ListModal = () => {
   const { listModal } = useAppSelector((state) => state.modal);
-  const [listPrice, setListPrice] = useState<number>(0);
+  const [listPrice, setListPrice] = useState<string>("");
   const { address: myAddress } = useAccount();
   const dispatch = useAppDispatch();
   const nft = useAppSelector((state) => state.nft);
@@ -58,7 +58,7 @@ const ListModal = () => {
       toast.warn("Please connect your wallet!");
       return;
     }
-    if (listPrice <= 0) {
+    if (Number(listPrice) <= 0) {
       toast.warn("Please insert positive price!");
       return;
     }
@@ -88,7 +88,7 @@ const ListModal = () => {
       toast.warn("Please connect your wallet!");
       return;
     }
-    if (listPrice <= 0) {
+    if (Number(listPrice) <= 0) {
       toast.warn("Please insert positive price.");
       return;
     }
@@ -193,8 +193,8 @@ const ListModal = () => {
                 </span>
               </div>
 
-              <div className="relative flex gap-5 py-4 border-t border-b dark:border-jacarta-600 border-jacarta-100">
-                <figure className="self-start">
+              <div className="relative flex flex-col md:flex-row gap-5 py-4 border-t border-b dark:border-jacarta-600 border-jacarta-100">
+                <figure className="self-start mx-auto">
                   <img
                     src={
                       replacePinataUrl(metadataInfo?.image) ||
@@ -240,7 +240,7 @@ const ListModal = () => {
                     {metadataInfo?.name || "Unnamed"}
                   </h3>
                   {isListed ? (
-                    <div>
+                    <div className="mb-2">
                       <p>
                         Current Listed Price: {ethers.utils.formatEther(price)}{" "}
                         {data?.symbol}
@@ -267,7 +267,7 @@ const ListModal = () => {
                         className="focus:ring-accent h-12 w-full flex-[3] border-0 focus:ring-inset bg-transparent"
                         placeholder="Amount"
                         value={listPrice}
-                        onChange={(e) => setListPrice(Number(e.target.value))}
+                        onChange={(e) => setListPrice(e.target.value)}
                       />
                     </div>
                   </div>

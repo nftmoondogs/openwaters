@@ -248,7 +248,7 @@ const Collection = () => {
                 </div>
               )}
             </div>
-            <div className="mb-6">
+            <div className="mb-6 overflow-x-auto">
               <Tabs className="min-w-fit tabs">
                 <TabList className="flex items-center nav nav-tabs">
                   {tabsHeadText?.map(({ id, text, icon }) => (
@@ -272,20 +272,18 @@ const Collection = () => {
                   ))}
                 </TabList>
                 <TabPanel>
-                  <div id="" className="">
-                    <InfiniteScroll
-                      dataLength={collectionHistory.length}
-                      loader={<p className="text-center"></p>}
-                      next={fetchMoreHistory}
-                      hasMore={collectionHistory.length < historyCount}
-                      scrollableTarget="scrollableDiv"
-                    >
-                      <Activity_tab
-                        history={collectionHistory}
-                        showItems={true}
-                      />
-                    </InfiniteScroll>
-                  </div>
+                  <InfiniteScroll
+                    dataLength={collectionHistory.length}
+                    loader={<p className="text-center"></p>}
+                    next={fetchMoreHistory}
+                    hasMore={collectionHistory.length < historyCount}
+                    scrollableTarget="scrollableDiv"
+                  >
+                    <Activity_tab
+                      history={collectionHistory}
+                      showItems={true}
+                    />
+                  </InfiniteScroll>
                 </TabPanel>
               </Tabs>
             </div>
@@ -300,7 +298,7 @@ const Collection = () => {
                 next={fetchMoreNfts}
                 hasMore={collectionNfts.length < nftsCount}
               >
-                <div className="grid grid-cols-1 gap-[30px] md:grid-cols-3 lg:grid-cols-4">
+                <div className="grid grid-cols-2 gap-1 md:gap-[30px] md:grid-cols-3 lg:grid-cols-4">
                   {collectionNfts.map((nft, index) => {
                     return <NftCard nft={nft} key={index} />;
                   })}

@@ -35,8 +35,6 @@ const NftComponent = ({
     })();
   }, [nft]);
 
-  console.log(nft);
-
   return (
     <Link href={`/item/${collection?.address}/${nft?.tokenId}`}>
       <div className="flex gap-2 items-center cursor-pointer hover:text-accent">
@@ -48,7 +46,7 @@ const NftComponent = ({
           alt={nft?.collection?.name || "Unnamed"}
           className="w-[30px] h-[30px] object-cover rounded-2xl"
         />
-        <p className="">{metadataInfo?.name || "Unnamed"}</p>
+        <p className="truncate">{metadataInfo?.name || "Unnamed"}</p>
       </div>
     </Link>
   );

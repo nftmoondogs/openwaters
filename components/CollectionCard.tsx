@@ -8,8 +8,8 @@ const CollectionCard = ({ collection }: { collection: Collection }) => {
   return (
     <article key={id}>
       <Link href={`/collection/${address}`}>
-        <div className="cursor-pointer dark:bg-jacarta-700 dark:border-jacarta-700 border-jacarta-100 rounded-2xl border bg-white p-[1.1875rem] transition-shadow hover:shadow-lg">
-          <span className="w-full relative">
+        <div className="cursor-pointer overflow-hidden dark:bg-jacarta-700 dark:border-jacarta-700 border-jacarta-100 rounded-2xl border bg-white p-3 transition-shadow hover:shadow-lg">
+          <div className="w-full relative mb-3 overflow-hidden">
             <img
               src={
                 profileImage
@@ -23,18 +23,18 @@ const CollectionCard = ({ collection }: { collection: Collection }) => {
             {profileImage ? (
               <></>
             ) : (
-              <p className="absolute top-1/2 -translate-y-1/2 w-full text-center px-3 break-words text-xl text-jacarta-700 font-bold">
+              <p className="absolute top-1/2 -translate-y-1/2 w-full text-center px-3 break-words text-lg md:text-xl text-jacarta-700 font-bold">
                 {name || "Unnamed"}
               </p>
             )}
-          </span>
-          <div className="flex gap-2 items-center justify-between w-full wrap-">
+          </div>
+          <div className="flex flex-col md:flex-row gap-2 items-center justify-between w-full wrap-">
             <div className="overflow-x-hidden">
-              <span className="block mt-4 text-base font-display text-jacarta-700 dark:text-white break-words truncate">
+              <p className="mb-2 text-sm md:text-base text-center md:text-start font-display text-jacarta-700 dark:text-white break-words truncate overflow-hidden">
                 {name || "Unnamed"}
-              </span>
-              <div className="flex items-center justify-between mt-2 text-sm font-medium tracking-tight">
-                <div className="flex flex-wrap items-center">
+              </p>
+              <div className="text-sm font-medium tracking-tight">
+                <div className="flex flex-wrap items-center justify-center md:justify-start">
                   <div className="flex gap-1">
                     <span className="dark:text-jacarta-400">by</span>
                     <Link href={`/profile/${creator?.address}`}>
@@ -57,11 +57,11 @@ const CollectionCard = ({ collection }: { collection: Collection }) => {
                 </div>
               </div>
             </div>
-            <div>
-              <p className="block mt-4 text-sm font-display text-jacarta-700 dark:text-white text-right">
+            <div className="flex items-center gap-2 md:block h-full">
+              <p className="block text-sm font-display text-jacarta-700 dark:text-white text-right">
                 Items
               </p>
-              <p className="block mt-2 text-sm font-display text-jacarta-700 dark:text-white text-right">
+              <p className="block text-sm font-display text-jacarta-700 dark:text-white text-right">
                 {totalSupply}
               </p>
             </div>

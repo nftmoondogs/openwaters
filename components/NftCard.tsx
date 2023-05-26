@@ -43,7 +43,7 @@ const NftCard = ({ nft }: { nft: NFT }) => {
   return (
     <article>
       <Link href={`/item/${collection?.address}/${tokenId}`}>
-        <div className="cursor-pointer dark:bg-jacarta-700 dark:border-jacarta-700 border-jacarta-100 rounded-2.5xl block border bg-white p-[1.1875rem] transition-shadow hover:shadow-lg">
+        <div className="cursor-pointer dark:bg-jacarta-700 dark:border-jacarta-700 border-jacarta-100 rounded-2.5xl block border bg-white p-2 md:p-4 transition-shadow hover:shadow-lg">
           <figure className="relative">
             <img
               src={
@@ -55,8 +55,8 @@ const NftCard = ({ nft }: { nft: NFT }) => {
             />
           </figure>
 
-          <div className="flex items-center justify-between gap-1 mt-7">
-            <span className="text-base font-display text-jacarta-700 dark:text-white py-1 truncate">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-1 mt-3 overflow-hidden">
+            <span className="text-sm md:text-base font-display text-jacarta-700 dark:text-white py-1 truncate">
               {metadataInfo?.name || "Unnamed"}
             </span>
             {isListed && (
@@ -69,7 +69,7 @@ const NftCard = ({ nft }: { nft: NFT }) => {
             )}
           </div>
           <div className="mt-2 text-sm">
-            <span className="dark:text-jacarta-200 text-jacarta-700 flex items-center gap-1">
+            <span className="dark:text-jacarta-200 text-jacarta-700 flex flex-col md:flex-row items-center gap-0 md:gap-1">
               Owner:
               <Link href={`/profile/${owner?.address}`}>
                 <div className="flex items-center gap-1 ">

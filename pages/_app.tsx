@@ -35,7 +35,11 @@ function MyApp({ Component, pageProps }: any) {
         <WagmiConfig client={client}>
           <QueryClientProvider client={queryClient}>
             <Hydrate state={pageProps.dehydratedState}>
-              <ThemeProvider enableSystem={false} attribute="class">
+              <ThemeProvider
+                enableSystem={false}
+                attribute="class"
+                defaultTheme="dark"
+              >
                 <UserContext.Provider value={{ scrollRef: scrollRef }}>
                   <Layout>
                     <ToastContainer
