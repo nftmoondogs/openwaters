@@ -27,8 +27,10 @@ export default function Home() {
 
   useEffect(() => {
     (async () => {
-      const res = await apiGetHotNfts();
-      setHotNfts(res);
+      try {
+        const res = await apiGetHotNfts();
+        setHotNfts(res);
+      } catch (error) {}
     })();
   }, []);
 

@@ -1,27 +1,38 @@
 import { useCallback } from "react";
-import { ethers, BigNumber, ContractInterface } from "ethers";
-import { useProvider, useSigner } from "wagmi";
-import { readContractABI } from "../utils/contract";
+import { zeroAddress } from "viem";
+import { usePublicClient, useWalletClient, erc20ABI, erc721ABI } from "wagmi";
+import { readContract, writeContract, waitForTransaction } from "@wagmi/core";
 import { toast } from "react-toastify";
 
+import { marketplaceAbi } from "../abi/MarketplaceABI";
+
 export const useApprove = () => {
-  const provider = useProvider();
-  const { data: signer } = useSigner();
-
+  const publicClient = usePublicClient();
+  const { data: walletClient } = useWalletClient();
   const approve = useCallback(
-    async (contractAddress: string, assetAddress: string) => {
+    async (
+      tokenAddress: `0x${string}`,
+      ownerAddress: `0x${string}`,
+      spenderAddress: `0x${string}`,
+      amount: bigint
+    ) => {
       try {
-        if (signer && provider) {
-          const abi = await readContractABI("/contracts/ERC721.abi");
-          const contract = new ethers.Contract(assetAddress, abi, signer);
+        if (walletClient && publicClient) {
+          const allowance = await readContract({
+            address: tokenAddress,
+            abi: erc20ABI,
+            functionName: "allowance",
+            args: [ownerAddress, spenderAddress],
+          });
+          if (allowance < amount) {
+            const { hash } = await writeContract({
+              address: tokenAddress,
+              abi: erc20ABI,
+              functionName: "approve",
+              args: [spenderAddress, amount + allowance],
+            });
 
-          const isApproved = await contract.isApprovedForAll(
-            await signer.getAddress(),
-            contractAddress
-          );
-          if (!isApproved) {
-            const tx = await contract.setApprovalForAll(contractAddress, true);
-            await tx.wait();
+            await waitForTransaction({ hash });
           }
         }
       } catch (error: any) {
@@ -30,273 +41,145 @@ export const useApprove = () => {
         throw new Error(error);
       }
     },
-    [provider, signer]
+    [publicClient, walletClient]
   );
-
   return { approve };
 };
 
-export const useListAsset = () => {
-  const provider = useProvider();
-  const { data: signer } = useSigner();
-  const listAsset = useCallback(
-    async (
-      assetAddress: string,
-      tokenId: number | string,
-      contractAddress: string,
-      price: number | string | BigNumber
-    ) => {
+export const useApproveForAll = () => {
+  const publicClient = usePublicClient();
+  const { data: walletClient } = useWalletClient();
+  const approveForAll = useCallback(
+    async (contractAddress: string, assetAddress: string) => {
       try {
-        if (signer && provider) {
-          const abi: ContractInterface = (await readContractABI(
-            "/contracts/MarketplaceContract.abi"
-          )) as ContractInterface;
-
-          const contract = new ethers.Contract(contractAddress, abi, signer);
-          const tx = await contract.listItem(
-            assetAddress,
-            tokenId,
-            ethers.utils.parseEther(price.toString())
-          );
-          await tx.wait();
+        if (walletClient && publicClient) {
+          const isApproved = await readContract({
+            address: assetAddress as `0x${string}`,
+            abi: erc721ABI,
+            functionName: "isApprovedForAll",
+            args: [
+              walletClient.account.address,
+              contractAddress as `0x${string}`,
+            ],
+          });
+          if (!isApproved) {
+            const { hash } = await writeContract({
+              address: assetAddress as `0x${string}`,
+              abi: erc721ABI,
+              functionName: "setApprovalForAll",
+              args: [contractAddress as `0x${string}`, true],
+            });
+            await waitForTransaction({ hash });
+          }
         }
       } catch (error: any) {
-        toast.error(error.error.message);
-        console.log(error.error);
+        toast.error(error.message);
+        console.log(error);
         throw new Error(error);
       }
     },
-    [provider, signer]
+    [publicClient, walletClient]
   );
-
-  return { listAsset };
-};
-
-export const useEditList = () => {
-  const provider = useProvider();
-  const { data: signer } = useSigner();
-
-  const editList = useCallback(
-    async (
-      assetAddress: string,
-      tokenId: string | number,
-      newPrice: number | string | BigNumber,
-      contractAddress: string
-    ) => {
-      try {
-        if (signer && provider) {
-          const abi: ContractInterface = (await readContractABI(
-            "/contracts/MarketplaceContract.abi"
-          )) as ContractInterface;
-
-          const contract = new ethers.Contract(contractAddress, abi, signer);
-
-          const tx = await contract.updateListing(
-            assetAddress,
-            tokenId,
-            ethers.utils.parseEther(newPrice.toString())
-          );
-
-          await tx.wait();
-        }
-      } catch (error: any) {
-        toast.error(error.error.message);
-        console.log(error.error);
-        throw new Error(error);
-      }
-    },
-    [provider, signer]
-  );
-
-  return { editList };
-};
-
-export const useCancelList = () => {
-  const provider = useProvider();
-  const { data: signer } = useSigner();
-
-  const cancelList = useCallback(
-    async (
-      assetAddress: string,
-      tokenId: number | string,
-      contractAddress: string
-    ) => {
-      try {
-        if (signer && provider) {
-          const abi: ContractInterface = (await readContractABI(
-            "/contracts/MarketplaceContract.abi"
-          )) as ContractInterface;
-
-          const contract = new ethers.Contract(contractAddress, abi, signer);
-
-          const tx = await contract.cancelListing(assetAddress, tokenId);
-
-          await tx.wait();
-        }
-      } catch (error: any) {
-        toast.error(error.error.message);
-        console.log(error.error);
-        throw new Error(error);
-      }
-    },
-    [signer, provider]
-  );
-
-  return { cancelList };
+  return { approveForAll };
 };
 
 export const useBuyAsset = () => {
-  const provider = useProvider();
-  const { data: signer } = useSigner();
-
+  const publicClient = usePublicClient();
+  const { data: walletClient } = useWalletClient();
   const buyAsset = useCallback(
     async (
       signature: string,
       collectionOwnerAddress: string,
       collectionFee: number | string,
       assetAddress: string,
-      tokenId: number | string,
+      tokenId: string,
       contractAddress: string,
-      amount: number | string
+      tokenAddress: string,
+      sellerAddress: string,
+      price: string
     ) => {
       try {
-        if (signer && provider) {
-          const abi = await readContractABI(
-            `/contracts/MarketplaceContract.abi`
-          );
-          const contract = new ethers.Contract(contractAddress, abi, signer);
-          const tx = await contract.buyItem(
-            signature,
-            collectionOwnerAddress,
-            Number(collectionFee) * 100,
-            assetAddress,
-            tokenId,
-            {
-              value: amount,
-            }
-          );
-          await tx.wait();
+        if (walletClient && publicClient) {
+          let value;
+          if (tokenAddress === zeroAddress) {
+            value = BigInt(price);
+          } else {
+            value = 0n;
+          }
+
+          const { hash } = await writeContract({
+            address: contractAddress as `0x${string}`,
+            abi: marketplaceAbi,
+            functionName: "buyItem",
+            args: [
+              signature as `0x${string}`,
+              collectionOwnerAddress as `0x${string}`,
+              Number(collectionFee) * 100,
+              assetAddress as `0x${string}`,
+              BigInt(tokenId),
+              tokenAddress as `0x${string}`,
+              sellerAddress as `0x${string}`,
+              BigInt(price),
+            ],
+            value,
+          });
+
+          await waitForTransaction({ hash });
         }
       } catch (error: any) {
-        toast.error(error.data.message);
-        console.log(error.error);
+        // toast.error(error.data.message);
+        console.log(error);
         throw new Error(error);
       }
     },
-    [provider, signer]
+    [publicClient, walletClient]
   );
 
   return { buyAsset };
 };
 
-export const useOfferAsset = () => {
-  const provider = useProvider();
-  const { data: signer } = useSigner();
-
-  const offerAsset = useCallback(
-    async (
-      assetAddress: string,
-      tokenId: string | number,
-      amount: number | string | BigNumber,
-      contractAddress: string
-    ) => {
-      try {
-        if (signer && provider) {
-          const abi: ContractInterface = (await readContractABI(
-            "/contracts/MarketplaceContract.abi"
-          )) as ContractInterface;
-
-          const contract = new ethers.Contract(contractAddress, abi, signer);
-          const tx = await contract.makeOffer(
-            assetAddress,
-            tokenId,
-            ethers.utils.parseEther(amount.toString()),
-            { value: ethers.utils.parseEther(amount.toString()) }
-          );
-          await tx.wait();
-        }
-      } catch (error: any) {
-        console.log(error);
-        toast.error(error.data.message);
-        throw new Error(error);
-      }
-    },
-    [provider, signer]
-  );
-
-  return { offerAsset };
-};
-
-export const useCancelOffer = () => {
-  const provider = useProvider();
-  const { data: signer } = useSigner();
-
-  const cancelOffer = useCallback(
-    async (
-      assetAddress: string,
-      tokenId: string | number,
-      contractAddress: string
-    ) => {
-      try {
-        if (signer && provider) {
-          const abi: ContractInterface = (await readContractABI(
-            "/contracts/MarketplaceContract.abi"
-          )) as ContractInterface;
-
-          const contract = new ethers.Contract(contractAddress, abi, signer);
-          const tx = await contract.cancelOffer(assetAddress, tokenId);
-          await tx.wait();
-        }
-      } catch (error: any) {
-        toast.error(error.error.message);
-        console.log(error.error);
-        throw new Error(error);
-      }
-    },
-    [provider, signer]
-  );
-
-  return { cancelOffer };
-};
-
 export const useAcceptOffer = () => {
-  const provider = useProvider();
-  const { data: signer } = useSigner();
-
+  const publicClient = usePublicClient();
+  const { data: walletClient } = useWalletClient();
   const acceptOffer = useCallback(
     async (
       signature: string,
-      assetAddress: string,
-      tokenId: string | number,
       collectionOwner: string,
       collectionFee: string | number,
+      assetAddress: string,
+      tokenId: string,
+      tokenAddress: string,
       offererAddress: string,
+      offerPrice: string,
       contractAddress: string
     ) => {
       try {
-        if (signer && provider) {
-          const abi: ContractInterface = (await readContractABI(
-            "/contracts/MarketplaceContract.abi"
-          )) as ContractInterface;
+        if (walletClient && publicClient) {
+          const { hash } = await writeContract({
+            address: contractAddress as `0x${string}`,
+            abi: marketplaceAbi,
+            functionName: "acceptOffer",
+            args: [
+              signature as `0x${string}`,
+              collectionOwner as `0x${string}`,
+              Number(collectionFee) * 100,
+              assetAddress as `0x${string}`,
+              BigInt(tokenId),
+              tokenAddress as `0x${string}`,
+              offererAddress as `0x${string}`,
+              BigInt(offerPrice),
+            ],
+          });
 
-          const contract = new ethers.Contract(contractAddress, abi, signer);
-          const tx = await contract.acceptOffer(
-            signature,
-            assetAddress,
-            tokenId,
-            collectionOwner,
-            Number(collectionFee) * 100,
-            offererAddress
-          );
-          await tx.wait();
+          await waitForTransaction({ hash });
         }
       } catch (error: any) {
-        toast.error(error.error.message);
+        toast.error(error.message);
         console.log(error.error);
         throw new Error(error);
       }
     },
-    [provider, signer]
+    [publicClient, walletClient]
   );
 
   return { acceptOffer };

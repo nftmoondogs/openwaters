@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ethers } from "ethers";
+import { formatEther } from "viem";
 
 import { formatActivity, shortenAddress } from "../../utils";
 import { EXPLORER_URL } from "../../config/env";
@@ -91,6 +91,7 @@ const Activity_tab = ({
               const {
                 id,
                 price,
+                currency,
                 from,
                 to,
                 nft,
@@ -120,7 +121,7 @@ const Activity_tab = ({
                       }`}
                       role="cell"
                     >
-                      <NftComponent nft={nft} collection={collection}/>
+                      <NftComponent nft={nft} collection={collection} />
                     </div>
                   )}
                   <div
@@ -130,12 +131,12 @@ const Activity_tab = ({
                     {price ? (
                       <>
                         <img
-                          src="/svg/core-icon.svg"
+                          src={`/images/tokens/${currency}.png`}
                           alt="icon"
                           className="w-[16px] h-[16px] mr-1 icon"
                         />
                         <span className="text-sm font-medium tracking-tight text-green">
-                          {ethers.utils.formatEther(price)} CORE
+                          {formatEther(BigInt(price))} {currency}
                         </span>
                       </>
                     ) : (
@@ -171,25 +172,27 @@ const Activity_tab = ({
                     }`}
                     role="cell"
                   >
-                    <a
-                      className="flex flex-wrap items-center hover:text-accent"
-                      target="_blank"
-                      rel="nofollow noopener"
-                      title="Opens in a new window"
-                      href={`${EXPLORER_URL}/tx/${tx}`}
-                    >
-                      <span className="mr-1">View</span>
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                        width="24"
-                        height="24"
-                        className="w-4 h-4 fill-current"
+                    {tx && (
+                      <a
+                        className="flex flex-wrap items-center hover:text-accent"
+                        target="_blank"
+                        rel="nofollow noopener"
+                        title="Opens in a new window"
+                        href={`${EXPLORER_URL}/tx/${tx}`}
                       >
-                        <path fill="none" d="M0 0h24v24H0z" />
-                        <path d="M10 6v2H5v11h11v-5h2v6a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h6zm11-3v8h-2V6.413l-7.793 7.794-1.414-1.414L17.585 5H13V3h8z" />
-                      </svg>
-                    </a>
+                        <span className="mr-1">View</span>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 24 24"
+                          width="24"
+                          height="24"
+                          className="w-4 h-4 fill-current"
+                        >
+                          <path fill="none" d="M0 0h24v24H0z" />
+                          <path d="M10 6v2H5v11h11v-5h2v6a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h6zm11-3v8h-2V6.413l-7.793 7.794-1.414-1.414L17.585 5H13V3h8z" />
+                        </svg>
+                      </a>
+                    )}
                   </div>
                 </div>
               );

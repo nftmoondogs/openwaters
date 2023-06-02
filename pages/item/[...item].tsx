@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import { useAccount, useNetwork } from "wagmi";
+import { useNetwork } from "wagmi";
 import { switchNetwork } from "@wagmi/core";
-import { ethers } from "ethers";
+import { formatEther, zeroAddress } from "viem";
 
-import { useAppDispatch } from "../../redux/store";
+import { useAppDispatch, useAppSelector } from "../../redux/store";
 import { bidsModalShow, listModalShow } from "../../redux/modalSlice";
 import { setNft } from "../../redux/nftSlice";
-import { useBuyAsset } from "../../hooks/marketplace";
+import { useApprove, useBuyAsset } from "../../hooks/marketplace";
 
 import {
   isOwner,
@@ -31,6 +31,8 @@ import {
   CDN_URL,
   CHAIN_ID,
   MARKETPLACE_CONTRACT_ADDRESS,
+  WCORE_TOKEN_ADDRESS,
+  WOOF_TOKEN_ADDRESS,
 } from "../../config/env";
 import { toast } from "react-toastify";
 
@@ -48,9 +50,11 @@ const Item = () => {
     offers: [],
     count: 0,
   });
-  const { address: myAddress } = useAccount();
+  const userAccount = useAppSelector((state) => state.user);
+  const myAddress = userAccount.address;
   const { chain } = useNetwork();
   const { buyAsset } = useBuyAsset();
+  const { approve } = useApprove();
   const [metadataInfo, setMetadataInfo] = useState<any>();
   const marketplaceContractAddress = MARKETPLACE_CONTRACT_ADDRESS;
 
@@ -68,6 +72,12 @@ const Item = () => {
     const collectionFee = nftInfo?.collection?.royalty;
     const assetAddress = nftInfo?.collection?.address;
     const price = nftInfo?.price;
+    const tokenAddress =
+      nftInfo?.currency === "CORE"
+        ? zeroAddress
+        : nftInfo?.currency === "WCORE"
+        ? WCORE_TOKEN_ADDRESS
+        : WOOF_TOKEN_ADDRESS;
     try {
       if (!myAddress) {
         toast.warn("Please connect your wallet!");
@@ -79,8 +89,19 @@ const Item = () => {
       }
       const signature = await apiGetBuySignature(
         myAddress as string,
-        assetAddress
+        assetAddress,
+        tokenId as string,
+        tokenAddress
       );
+      if (tokenAddress !== zeroAddress) {
+        await approve(
+          tokenAddress,
+          myAddress as `0x${string}`,
+          marketplaceContractAddress,
+          price
+        );
+      }
+
       await buyAsset(
         signature,
         collectionOwnerAddress,
@@ -88,10 +109,14 @@ const Item = () => {
         assetAddress,
         tokenId as string,
         marketplaceContractAddress as string,
+        tokenAddress,
+        nftInfo?.owner?.address,
         price
       );
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
       setIsLoading(false);
-      window.location.reload();
     } catch (error: any) {
       console.log(error);
       setIsLoading(false);
@@ -227,7 +252,6 @@ const Item = () => {
 
             {/* <!-- Details --> */}
             <div className="md:w-3/5 md:basis-auto md:pl-8 lg:w-1/2 lg:pl-[3.75rem]">
-              {/* <!-- Collection / Likes / Actions --> */}
               <div className="flex mb-3">
                 {/* <!-- Collection --> */}
                 <div className="flex items-center">
@@ -237,14 +261,6 @@ const Item = () => {
                     </a>
                   </Link>
                 </div>
-
-                {/* <!-- Likes / Actions --> */}
-                {/* <div className="relative flex items-stretch ml-auto space-x-2">
-                  <Likes
-                    like={nftInfo?.likedByUsers?.length}
-                    classes="dark:bg-jacarta-700 dark:border-jacarta-600 border-jacarta-100 flex items-center space-x-1 rounded-xl border bg-white py-2 px-4"
-                  />
-                </div> */}
               </div>
 
               <h1 className="mb-4 text-4xl font-semibold font-display text-jacarta-700 dark:text-white">
@@ -253,15 +269,13 @@ const Item = () => {
               {nftInfo?.isListed && (
                 <div className="flex items-center mb-8 space-x-4 whitespace-nowrap">
                   <div className="flex items-center">
-                    <span className="-ml-1">
-                      <img
-                        src="/svg/core-icon.svg"
-                        alt="icon"
-                        className="w-4 h-4 mr-1 icon"
-                      />
-                    </span>
+                    <img
+                      src={`/images/tokens/${nftInfo?.currency}.png`}
+                      alt="icon"
+                      className="w-4 h-4 mr-1 icon"
+                    />
                     <span className="text-sm font-medium tracking-tight text-green">
-                      {ethers.utils.formatEther(nftInfo?.price) || 0} CORE
+                      {formatEther(nftInfo?.price) || 0} {nftInfo?.currency}
                     </span>
                   </div>
                 </div>
@@ -351,11 +365,11 @@ const Item = () => {
                         Buy Now
                       </CustomButton>
                     )}
-                    {/* {!checkOffered(offers.offers, myAddress as string) && (
+                    {!checkOffered(offers.offers, myAddress as string) && (
                       <CustomButton onClick={handleOpenBidModal}>
                         Make Offer
                       </CustomButton>
-                    )} */}
+                    )}
                   </>
                 )}
               </div>

@@ -1,31 +1,28 @@
 import React, { useState, useEffect } from "react";
 import { useAccount, useBalance, useNetwork } from "wagmi";
-import { switchNetwork } from "@wagmi/core";
-import { ethers } from "ethers";
+import { switchNetwork, signTypedData } from "@wagmi/core";
+import { formatEther, parseEther } from "viem";
 import { toast } from "react-toastify";
 
 import { useAppDispatch, useAppSelector } from "../../redux/store";
 import { bidsModalHide } from "../../redux/modalSlice";
-import { useOfferAsset } from "../../hooks/marketplace";
+import { useApprove } from "../../hooks/marketplace";
 
 import { replacePinataUrl } from "../../utils";
-import { apiGetNftMetadata } from "../../utils/api";
+import { apiGetNftMetadata, apiOfferNft } from "../../utils/api";
 
 import CustomButton from "../CustomButton";
-import { MARKETPLACE_CONTRACT_ADDRESS, CHAIN_ID } from "../../config/env";
+import Dropdown from "../Dropdown";
+import {
+  MARKETPLACE_CONTRACT_ADDRESS,
+  CHAIN_ID,
+  WCORE_TOKEN_ADDRESS,
+  WOOF_TOKEN_ADDRESS,
+} from "../../config/env";
 
 const BidsModal = () => {
   const { bidsModal } = useAppSelector((state) => state.modal);
   const userAccount = useAppSelector((state) => state.user);
-  const { address: myAddress } = useAccount();
-  const dispatch = useAppDispatch();
-  const { data } = useBalance({
-    address: userAccount.address as `0x${string}`,
-  });
-  const { chain } = useNetwork();
-  const { offerAsset } = useOfferAsset();
-  const [offerPrice, setOfferPrice] = useState<number>(0);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const nft = useAppSelector((state) => state.nft);
   const {
     id,
@@ -35,9 +32,68 @@ const BidsModal = () => {
     metadataUrl,
     metaData,
     price,
+    currency,
     isListed,
   } = nft;
-  const marketplaceContractAddress = MARKETPLACE_CONTRACT_ADDRESS;
+  const dispatch = useAppDispatch();
+
+  const { chain } = useNetwork();
+  const { address: myAddress } = useAccount();
+  const { data: wcoreBalance } = useBalance({
+    address: userAccount.address as `0x${string}`,
+    token: WCORE_TOKEN_ADDRESS,
+    chainId: CHAIN_ID,
+  });
+  const { data: woofBalance } = useBalance({
+    address: userAccount.address as `0x${string}`,
+    token: WOOF_TOKEN_ADDRESS,
+    chainId: CHAIN_ID,
+  });
+
+  const [offerPrice, setOfferPrice] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [selectedToken, setSelectedToken] = useState<number>(0);
+  const { approve } = useApprove();
+
+  const tokens = [
+    {
+      name: "WCORE",
+      address: WCORE_TOKEN_ADDRESS,
+      component: (
+        <>
+          <img src="/images/tokens/WCORE.png" alt="icon" className="w-4 h-4" />
+          <p className="text-sm font-bold">WCORE</p>
+        </>
+      ),
+    },
+    {
+      name: "WOOF",
+      address: WOOF_TOKEN_ADDRESS,
+      component: (
+        <>
+          <img src="/images/tokens/WOOF.png" alt="icon" className="w-4 h-4" />
+          <p className="text-sm font-bold">WOOF</p>
+        </>
+      ),
+    },
+  ];
+
+  const domain = {
+    name: "Openwaters",
+    version: "1",
+    chainId: 1116,
+    verifyingContract: MARKETPLACE_CONTRACT_ADDRESS as `0x${string}`,
+  } as const;
+
+  const types = {
+    Message: [
+      { name: "collectionAddress", type: "address" },
+      { name: "tokenId", type: "string" },
+      { name: "price", type: "string" },
+      { name: "currency", type: "string" },
+    ],
+  } as const;
+
   const handleHideModal = () => {
     dispatch(bidsModalHide());
   };
@@ -48,22 +104,63 @@ const BidsModal = () => {
       toast.warn("Please connect your wallet!");
       return;
     }
-    if (offerPrice <= 0) {
+    if (Number(offerPrice) <= 0) {
       toast.warn("Please input positive price.");
       return;
     }
-    const assetAddress = collection?.address;
+    if (
+      selectedToken === 0 &&
+      Number(offerPrice) > Number(wcoreBalance?.formatted)
+    ) {
+      toast.warn("You don't have enough balance.");
+      return;
+    }
+    if (
+      selectedToken === 1 &&
+      Number(offerPrice) > Number(woofBalance?.formatted)
+    ) {
+      toast.warn("You don't have enough balance.");
+      return;
+    }
+
     try {
       setIsLoading(true);
+
       if (chain?.id !== CHAIN_ID) {
         await switchNetwork({ chainId: CHAIN_ID });
       }
-      await offerAsset(
-        assetAddress,
-        tokenId,
-        offerPrice,
-        marketplaceContractAddress as string
+
+      const message = {
+        collectionAddress: collection?.address as `0x${string}`,
+        tokenId: nft?.tokenId,
+        price: offerPrice,
+        currency: tokens[selectedToken].name,
+      } as const;
+
+      const signature = await signTypedData({
+        domain,
+        message,
+        primaryType: "Message",
+        types,
+      });
+      await approve(
+        tokens[selectedToken].address,
+        userAccount.address as `0x${string}`,
+        MARKETPLACE_CONTRACT_ADDRESS,
+        parseEther(offerPrice as `${number}`)
       );
+      const res = await apiOfferNft({
+        userAddress: myAddress,
+        message: { domain, types, value: message },
+        signature,
+      });
+
+      // await offerAsset(
+      //   assetAddress,
+      //   tokenId,
+      //   offerPrice,
+      //   MARKETPLACE_CONTRACT_ADDRESS as string
+      // );
       setIsLoading(false);
       window.location.reload();
     } catch (error) {
@@ -125,7 +222,7 @@ const BidsModal = () => {
                 </span>
               </div>
 
-              <div className="relative flex py-4 border-t border-b dark:border-jacarta-600 border-jacarta-100">
+              <div className="relative flex flex-col md:flex-row gap-5 py-4 border-t border-b dark:border-jacarta-600 border-jacarta-100">
                 <figure className="self-start mr-5">
                   <img
                     src={
@@ -172,26 +269,25 @@ const BidsModal = () => {
                     {metadataInfo?.name || "Unnamed"}
                   </h3>
                   {isListed ? (
-                    <div>
+                    <div className="mb-2">
                       <p>
-                        Current Listed Price: {ethers.utils.formatEther(price)}{" "}
-                        {data?.symbol}
+                        Current Listed Price: {formatEther(BigInt(price))}{" "}
+                        {currency}
                       </p>
                     </div>
                   ) : (
                     <></>
                   )}
 
-                  <div>
+                  <div className="mb-2">
                     <p>Offer for:</p>
-                    <div className="relative flex items-center mb-2 overflow-hidden border rounded-lg dark:border-jacarta-600 border-jacarta-100">
-                      <div className="flex items-center justify-center flex-1 px-2">
-                        <img
-                          src="/svg/core-icon.svg"
-                          alt="icon"
-                          className="w-4 h-4 mr-1 icon"
+                    <div className="relative flex items-center border rounded-lg dark:border-jacarta-600 border-jacarta-100">
+                      <div className="flex items-center w-[112px] border-r border-r-jacarta-100 dark:border-r-jacarta-600">
+                        <Dropdown
+                          dropdownDefault={tokens[selectedToken].component}
+                          items={tokens}
+                          onSelect={setSelectedToken}
                         />
-                        <p className="text-sm font-bold">{data?.symbol}</p>
                       </div>
 
                       <input
@@ -199,8 +295,17 @@ const BidsModal = () => {
                         className="focus:ring-accent h-12 w-full flex-[3] border-0 focus:ring-inset bg-transparent"
                         placeholder="Amount"
                         value={offerPrice}
-                        onChange={(e) => setOfferPrice(Number(e.target.value))}
+                        onChange={(e) => setOfferPrice(e.target.value)}
                       />
+                    </div>
+                    <div className="flex gap-1 items-center justify-end text-xs">
+                      <p>Balance:</p>
+                      {selectedToken === 0 && (
+                        <p>{wcoreBalance?.formatted} WCORE</p>
+                      )}
+                      {selectedToken === 1 && (
+                        <p>{woofBalance?.formatted} WOOF</p>
+                      )}
                     </div>
                   </div>
                   <CustomButton onClick={handleOfferAsset} disabled={isLoading}>

@@ -101,7 +101,7 @@ export default function WalletButton() {
             </span>
             <div className="flex items-center">
               <img
-                src="/svg/core-icon.svg"
+                src="/images/tokens/CORE.png"
                 alt="icon"
                 className="-ml-1 mr-1 h-[1.125rem] w-[1.125rem] icon"
               />

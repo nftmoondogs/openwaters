@@ -18,6 +18,7 @@ const initialState = {
   metadataUrl: "",
   metaData: "",
   price: "",
+  currency: "",
   isListed: false,
 };
 

@@ -90,7 +90,7 @@ const User = () => {
               </h2>
               <div className="dark:bg-jacarta-700 dark:border-jacarta-600 border-jacarta-100 mb-8 inline-flex items-center justify-center rounded-full border bg-white py-1.5 px-4">
                 <img
-                  src="/svg/core-icon.svg"
+                  src="/images/tokens/CORE.png"
                   alt="icon"
                   className="w-4 h-4 mr-1 icon"
                 />

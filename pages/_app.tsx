@@ -15,7 +15,7 @@ import Meta from "../components/Meta";
 import Layout from "../components/Layout/Layout";
 import UserContext from "../components/UserContext";
 
-import { client } from "../wagmi";
+import { config } from "../wagmi";
 
 import "../styles/globals.css";
 import "react-toastify/dist/ReactToastify.css";
@@ -32,7 +32,7 @@ function MyApp({ Component, pageProps }: any) {
       <Meta title="Home" />
 
       <Provider store={store}>
-        <WagmiConfig client={client}>
+        <WagmiConfig config={config}>
           <QueryClientProvider client={queryClient}>
             <Hydrate state={pageProps.dehydratedState}>
               <ThemeProvider

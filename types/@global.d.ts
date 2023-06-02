@@ -43,6 +43,7 @@ type NFT = {
   metadataUrl: string;
   metaData: string;
   isListed: boolean;
+  currency: string;
   likedByUsers?: User[];
 };
 
@@ -52,6 +53,7 @@ type Offer = {
   tokenId: string;
   offerer: User;
   price: string;
+  currency: string;
   txHash: string;
   blockNumber: number;
   timestamp: number;
@@ -65,6 +67,7 @@ type Transaction = {
   to: User;
   nft: NFT;
   price: string;
+  currency: string;
   eventType:
     | "Minted"
     | "Transfer"
@@ -76,6 +79,16 @@ type Transaction = {
   timestamp: number;
   createdAt: string;
 };
+
+// type MessageType = {
+//   collectionAddress: string,
+
+// }
+
+// type ListNftData = {
+//   userAddress: string;
+
+// }
 
 type TransactionDataType = {
   collectionAddress: string;

@@ -22,11 +22,11 @@ const ItemsTabs = ({
   const [metadataInfo, setMetadataInfo] = useState<any>();
   const { chain } = useNetwork();
   const tabsHeadText = [
-    // {
-    //   id: 1,
-    //   text: "Offers",
-    //   icon: "offers",
-    // },
+    {
+      id: 1,
+      text: "Offers",
+      icon: "offers",
+    },
     {
       id: 2,
       text: "Properties",
@@ -97,9 +97,9 @@ const ItemsTabs = ({
             })}
           </TabList>
 
-          {/* <TabPanel>
+          <TabPanel>
             <OfferTab offers={offers} nftInfo={nftInfo} />
-          </TabPanel> */}
+          </TabPanel>
           <TabPanel>
             <Properties properties={metadataInfo?.attributes} />
           </TabPanel>

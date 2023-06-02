@@ -19,7 +19,7 @@ const Top_collection = ({ collections }: { collections: Collection[] }) => {
         <div className="container">
           <div className="flex items-center justify-center mb-12 text-lg text-center font-display text-jacarta-700 sm:text-3xl dark:text-white gap-x-3">
             <HeadLine
-              text="Top Collections"
+              text="Top collections"
               classes="inline"
               image={""}
               pera={""}

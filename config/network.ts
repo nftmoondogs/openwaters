@@ -68,18 +68,18 @@ const mainnet: Chain = {
       url: "https://scan.coredao.org",
     },
   },
-  contracts: {
-    ensRegistry: {
-      address: "0x4d1d23CF011914EcD6af659173eB02cc99e119BF",
-    },
-    ensUniversalResolver: {
-      address: "0x4d1d23CF011914EcD6af659173eB02cc99e119BF",
-    },
-    multicall3: {
-      address: "0x4d1d23CF011914EcD6af659173eB02cc99e119BF",
-      blockCreated: 7572063,
-    },
-  },
+  // contracts: {
+  //   ensRegistry: {
+  //     address: "0x4d1d23CF011914EcD6af659173eB02cc99e119BF",
+  //   },
+  //   ensUniversalResolver: {
+  //     address: "0x4d1d23CF011914EcD6af659173eB02cc99e119BF",
+  //   },
+  //   multicall3: {
+  //     address: "0x4d1d23CF011914EcD6af659173eB02cc99e119BF",
+  //     blockCreated: 7572063,
+  //   },
+  // },
 };
 
 export { testnet, mainnet };

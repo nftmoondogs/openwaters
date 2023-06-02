@@ -1,11 +1,11 @@
 import React, { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useAccount, useConnect, useNetwork, useSwitchNetwork } from "wagmi";
+import { InjectedConnector } from "wagmi/connectors/injected";
 import { walletModalHide } from "../../redux/modalSlice";
 import { testnet, mainnet } from "../../config/network";
 import { toast } from "react-toastify";
 import { getUser } from "../../redux/userSlice";
-import { C } from "@wagmi/connectors/dist/base-84a689bb";
 import { RootState, useAppDispatch } from "../../redux/store";
 
 const Wallet_modal = () => {
@@ -13,8 +13,9 @@ const Wallet_modal = () => {
     (state: RootState) => state.modal.walletModal
   );
   const dispatch = useAppDispatch();
-  const { connectAsync, connectors, isLoading, pendingConnector } =
-    useConnect();
+  const { connectAsync, connectors, isLoading, pendingConnector } = useConnect({
+    connector: new InjectedConnector(),
+  });
   const { switchNetwork } = useSwitchNetwork();
   const { isConnected } = useAccount();
   const { chain } = useNetwork();
@@ -33,7 +34,7 @@ const Wallet_modal = () => {
     }
   }, [chain, switchNetwork]);
 
-  const handleConnect = async (connector: C<any, any, any>) => {
+  const handleConnect = async (connector: any) => {
     try {
       const result = await connectAsync({ connector });
       dispatch(getUser(result.account));

@@ -1,10 +1,10 @@
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
+import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
 
 // import { WHITELABEL_ID } from 'src/config/env';
 
 interface Headers {
   [key: string]: any;
-  'whitelabel-id'?: string;
+  "whitelabel-id"?: string;
   wallet?: any;
   ticket?: any;
 }
@@ -34,13 +34,13 @@ const withPromise = <T>(axiosInstance: Promise<AxiosResponse<T>>): Promise<T> =>
       (err) => {
         // service is unavailable
         if (!err.response) {
-          reject(new Error('Service is unavailable'));
+          reject(new Error("Service is unavailable"));
           return;
         }
 
         if (err.response.status === 403) {
           // redirect to the homepage if permission is denied
-          document.location.href = '/';
+          document.location.href = "/";
         }
 
         // general error
@@ -73,11 +73,16 @@ function del<T>(endpoint: string): Promise<T> {
   return withPromise<T>(getInstance().delete(endpoint));
 }
 
+function patch<T>(endpoint: string, body: any = {}): Promise<T> {
+  return withPromise<T>(getInstance().patch(endpoint, body));
+}
+
 const api = {
   get,
   post,
   put,
   del,
+  patch
 };
 
 export default api;

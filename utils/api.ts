@@ -1,4 +1,3 @@
-import { toast } from "react-toastify";
 import api from "../lib/axios";
 import { SERVER_API } from "../config/env";
 
@@ -17,6 +16,19 @@ export const apiGetResponse = async <T>(url: string): Promise<T> => {
 export const apiPutResponse = async <T>(url: string, data: any): Promise<T> => {
   try {
     const res: T = await api.put(url, data);
+    return res;
+  } catch (error: any) {
+    console.log(error);
+    throw new Error(error);
+  }
+};
+
+export const apiPatchResponse = async <T>(
+  url: string,
+  data: any
+): Promise<T> => {
+  try {
+    const res: T = await api.patch(url, data);
     return res;
   } catch (error: any) {
     console.log(error);
@@ -214,9 +226,27 @@ export const apiGetNft = async (collectionAddress: string, tokenId: string) => {
 
 export const apiGetBuySignature = async (
   signerAddress: string,
-  collectionAddress: string
+  collectionAddress: string,
+  tokenId: string,
+  tokenAddress: string
 ) => {
-  const url = `${apiUrl}/nft/purchase?signer=${signerAddress}&collectionAddress=${collectionAddress}`;
+  const url = `${apiUrl}/nft/purchase?signer=${signerAddress}&collectionAddress=${collectionAddress}&tokenId=${tokenId}&tokenAddress=${tokenAddress}`;
+  try {
+    const res: string = await apiGetResponse(url);
+    return res;
+  } catch (error: any) {
+    throw new Error(error);
+  }
+};
+
+export const apiGetOfferSignature = async (
+  signerAddress: string,
+  collectionAddress: string,
+  tokenId: string,
+  tokenAddress: string,
+  offererAddress: string
+) => {
+  const url = `${apiUrl}/nft/accept?signer=${signerAddress}&collectionAddress=${collectionAddress}&tokenId=${tokenId}&tokenAddress=${tokenAddress}&offererAddress=${offererAddress}`;
   try {
     const res: string = await apiGetResponse(url);
     return res;
@@ -273,6 +303,42 @@ export const apiGetNftMetadata = async (
   const url = `${apiUrl}/nft?tokenURI=${tokenUri}&collectionAddress=${collectionAddress}&tokenId=${tokenId}`;
   try {
     const res = await apiGetResponse(url);
+    return res;
+  } catch (error: any) {
+    throw new Error(error);
+  }
+};
+
+export const apiListNft = async (body: {
+  userAddress: string;
+  message: {
+    domain: any;
+    types: any;
+    value: any;
+  };
+  signature: string;
+}) => {
+  const url = `${apiUrl}/nft`;
+  try {
+    const res = await apiPatchResponse(url, body);
+    return res;
+  } catch (error: any) {
+    throw new Error(error);
+  }
+};
+
+export const apiOfferNft = async (body: {
+  userAddress: string;
+  message: {
+    domain: any;
+    types: any;
+    value: any;
+  };
+  signature: string;
+}) => {
+  const url = `${apiUrl}/offer`;
+  try {
+    const res = await apiPatchResponse(url, body);
     return res;
   } catch (error: any) {
     throw new Error(error);

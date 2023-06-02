@@ -1,24 +1,27 @@
 import { useState, useEffect } from "react";
 import { useAccount, useNetwork, useBalance } from "wagmi";
-import { switchNetwork } from "@wagmi/core";
-import { ethers } from "ethers";
+import { switchNetwork, signTypedData } from "@wagmi/core";
+import { formatEther } from "viem";
 import { toast } from "react-toastify";
 
 import { useAppSelector, useAppDispatch } from "../../redux/store";
 import { listModalHide } from "../../redux/modalSlice";
 import { setInitial } from "../../redux/nftSlice";
 import {
-  useApprove,
-  useListAsset,
-  useEditList,
-  useCancelList,
+  useApproveForAll,
 } from "../../hooks/marketplace";
 
 import { replacePinataUrl } from "../../utils";
-import { apiGetNftMetadata } from "../../utils/api";
+import { apiGetNftMetadata, apiListNft } from "../../utils/api";
 
 import CustomButton from "../CustomButton";
-import { MARKETPLACE_CONTRACT_ADDRESS, CHAIN_ID } from "../../config/env";
+import Dropdown from "../Dropdown";
+import {
+  MARKETPLACE_CONTRACT_ADDRESS,
+  CHAIN_ID,
+  WOOF_TOKEN_ADDRESS,
+  WCORE_TOKEN_ADDRESS,
+} from "../../config/env";
 
 const ListModal = () => {
   const { listModal } = useAppSelector((state) => state.modal);
@@ -34,24 +37,78 @@ const ListModal = () => {
     metadataUrl,
     metaData,
     price,
+    currency,
     isListed,
   } = nft;
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const userAccount = useAppSelector((state) => state.user);
   const [metadataInfo, setMetadataInfo] = useState<any>();
+  const [selectedToken, setSelectedToken] = useState<number>(0);
   const handleHideModal = () => {
     dispatch(listModalHide());
     dispatch(setInitial());
   };
-  const { data } = useBalance({
+  const { data: coreBalance } = useBalance({
     address: userAccount.address as `0x${string}`,
+    watch: true,
   });
+  const { data: wcoreBalance } = useBalance({
+    address: userAccount.address as `0x${string}`,
+    token: WCORE_TOKEN_ADDRESS,
+  });
+  const { data: woofBalance } = useBalance({
+    address: userAccount.address as `0x${string}`,
+    token: WOOF_TOKEN_ADDRESS,
+  });
+
+  const tokens = [
+    {
+      name: "CORE",
+      component: (
+        <>
+          <img src="/images/tokens/CORE.png" alt="icon" className="w-4 h-4" />
+          <p className="text-sm font-bold">CORE</p>
+        </>
+      ),
+    },
+    {
+      name: "WCORE",
+      component: (
+        <>
+          <img src="/images/tokens/WCORE.png" alt="icon" className="w-4 h-4" />
+          <p className="text-sm font-bold">WCORE</p>
+        </>
+      ),
+    },
+    {
+      name: "WOOF",
+      component: (
+        <>
+          <img src="/images/tokens/WOOF.png" alt="icon" className="w-4 h-4" />
+          <p className="text-sm font-bold">WOOF</p>
+        </>
+      ),
+    },
+  ];
+
   const { chain } = useNetwork();
-  const { approve } = useApprove();
-  const { listAsset } = useListAsset();
-  const { editList } = useEditList();
-  const { cancelList } = useCancelList();
-  const marketplaceContractAddress = MARKETPLACE_CONTRACT_ADDRESS;
+  const { approveForAll } = useApproveForAll();
+
+  const domain = {
+    name: "Openwaters",
+    version: "1",
+    chainId: 1116,
+    verifyingContract: MARKETPLACE_CONTRACT_ADDRESS as `0x${string}`,
+  } as const;
+
+  const types = {
+    Message: [
+      { name: "collectionAddress", type: "address" },
+      { name: "tokenId", type: "string" },
+      { name: "price", type: "string" },
+      { name: "currency", type: "string" },
+    ],
+  } as const;
 
   const handleListAsset = async () => {
     if (!myAddress) {
@@ -62,59 +119,94 @@ const ListModal = () => {
       toast.warn("Please insert positive price!");
       return;
     }
-    const assetAddress = collection?.address;
     try {
       setIsLoading(true);
       if (chain?.id !== CHAIN_ID) {
         await switchNetwork({ chainId: CHAIN_ID });
       }
-      await approve(marketplaceContractAddress as string, assetAddress);
-      await listAsset(
-        assetAddress,
-        tokenId,
-        marketplaceContractAddress as string,
-        listPrice
+      const message = {
+        collectionAddress: collection?.address as `0x${string}`,
+        tokenId: nft?.tokenId,
+        price: listPrice,
+        currency: tokens[selectedToken].name,
+      } as const;
+
+      const signature = await signTypedData({
+        domain,
+        message,
+        primaryType: "Message",
+        types,
+      });
+
+      await approveForAll(
+        MARKETPLACE_CONTRACT_ADDRESS as string,
+        collection?.address
       );
+      const res = await apiListNft({
+        userAddress: myAddress,
+        message: { domain, types, value: message },
+        signature,
+      });
+
+      // await approve(MARKETPLACE_CONTRACT_ADDRESS as string, assetAddress);
+      // await listAsset(
+      //   assetAddress,
+      //   tokenId,
+      //   MARKETPLACE_CONTRACT_ADDRESS as string,
+      //   listPrice
+      // );
       setIsLoading(false);
       window.location.reload();
     } catch (error: any) {
-      console.log(error);
       setIsLoading(false);
     }
   };
 
-  const handleEditList = async () => {
-    if (!myAddress) {
-      toast.warn("Please connect your wallet!");
-      return;
-    }
-    if (Number(listPrice) <= 0) {
-      toast.warn("Please insert positive price.");
-      return;
-    }
-    if (listPrice.toString() === ethers.utils.formatEther(price.toString())) {
-      toast.warn("Please insert different value from current price.");
-      return;
-    }
-    const assetAddress = collection?.address;
-    try {
-      setIsLoading(true);
-      if (chain?.id !== CHAIN_ID) {
-        await switchNetwork({ chainId: CHAIN_ID });
-      }
-      await editList(
-        assetAddress,
-        tokenId,
-        listPrice,
-        marketplaceContractAddress as string
-      );
-      setIsLoading(false);
-      window.location.reload();
-    } catch (error: any) {
-      console.log(error);
-      setIsLoading(false);
-    }
-  };
+  // const handleEditList = async () => {
+  //   if (!myAddress) {
+  //     toast.warn("Please connect your wallet!");
+  //     return;
+  //   }
+  //   if (Number(listPrice) <= 0) {
+  //     toast.warn("Please insert positive price.");
+  //     return;
+  //   }
+  //   try {
+  //     setIsLoading(true);
+  //     if (chain?.id !== CHAIN_ID) {
+  //       await switchNetwork({ chainId: CHAIN_ID });
+  //     }
+  //     const message = {
+  //       collectionAddress: collection?.address as `0x${string}`,
+  //       tokenId: nft?.tokenId,
+  //       price: listPrice,
+  //       currency: tokens[selectedToken].name,
+  //     } as const;
+
+  //     const signature = await signTypedData({
+  //       domain,
+  //       message,
+  //       primaryType: "Message",
+  //       types,
+  //     });
+
+  //     const res = await apiListNft({
+  //       userAddress: myAddress,
+  //       message: { domain, types, value: message },
+  //       signature,
+  //     });
+  //     // await editList(
+  //     //   assetAddress,
+  //     //   tokenId,
+  //     //   listPrice,
+  //     //   MARKETPLACE_CONTRACT_ADDRESS as string
+  //     // );
+  //     setIsLoading(false);
+  //     window.location.reload();
+  //   } catch (error: any) {
+  //     setIsLoading(false);
+  //   }
+  // };
 
   const handleCancelList = async () => {
     const assetAddress = collection?.address;
@@ -127,11 +219,30 @@ const ListModal = () => {
       if (chain?.id !== CHAIN_ID) {
         await switchNetwork({ chainId: CHAIN_ID });
       }
-      await cancelList(
-        assetAddress,
-        tokenId,
-        marketplaceContractAddress as string
-      );
+      const message = {
+        collectionAddress: collection?.address as `0x${string}`,
+        tokenId: nft?.tokenId,
+        price: "0",
+        currency: tokens[selectedToken].name,
+      } as const;
+
+      const signature = await signTypedData({
+        domain,
+        message,
+        primaryType: "Message",
+        types,
+      });
+
+      const res = await apiListNft({
+        userAddress: myAddress,
+        message: { domain, types, value: message },
+        signature,
+      });
+      // await cancelList(
+      //   assetAddress,
+      //   tokenId,
+      //   MARKETPLACE_CONTRACT_ADDRESS as string
+      // );
       setIsLoading(false);
       window.location.reload();
     } catch (error: any) {
@@ -242,8 +353,8 @@ const ListModal = () => {
                   {isListed ? (
                     <div className="mb-2">
                       <p>
-                        Current Listed Price: {ethers.utils.formatEther(price)}{" "}
-                        {data?.symbol}
+                        Current Listed Price: {formatEther(BigInt(price))}{" "}
+                        {currency}
                       </p>
                     </div>
                   ) : (
@@ -252,19 +363,17 @@ const ListModal = () => {
 
                   <div>
                     <p>List for:</p>
-                    <div className="relative flex items-center mb-2 overflow-hidden border rounded-lg dark:border-jacarta-600 border-jacarta-100">
-                      <div className="flex items-center justify-center flex-1 px-2">
-                        <img
-                          src="/svg/core-icon.svg"
-                          alt="icon"
-                          className="w-4 h-4 mr-1 icon"
+                    <div className="relative flex items-center justify-center mb-2 border rounded-lg dark:border-jacarta-600 border-jacarta-100">
+                      <div className="flex items-center w-[112px] border-r border-r-jacarta-100 dark:border-r-jacarta-600">
+                        <Dropdown
+                          dropdownDefault={tokens[selectedToken].component}
+                          items={tokens}
+                          onSelect={setSelectedToken}
                         />
-                        <p className="text-sm font-bold">{data?.symbol}</p>
                       </div>
-
                       <input
                         type="number"
-                        className="focus:ring-accent h-12 w-full flex-[3] border-0 focus:ring-inset bg-transparent"
+                        className="focus:ring-accent h-12 w-full flex-[2] border-0 focus:ring-inset bg-transparent"
                         placeholder="Amount"
                         value={listPrice}
                         onChange={(e) => setListPrice(e.target.value)}
@@ -274,7 +383,7 @@ const ListModal = () => {
                   {isListed ? (
                     <div className="flex flex-col md:flex-row gap-2">
                       <CustomButton
-                        onClick={handleEditList}
+                        onClick={handleListAsset}
                         disabled={isLoading}
                         className="w-full"
                       >

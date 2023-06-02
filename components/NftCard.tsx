@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ethers } from "ethers";
+import { formatEther } from "viem";
 
 import { shortenAddress, replacePinataUrl } from "../utils";
 import { CDN_URL } from "../config/env";
@@ -16,6 +16,7 @@ const NftCard = ({ nft }: { nft: NFT }) => {
     metadataUrl,
     metaData,
     price,
+    currency,
     isListed,
   } = nft;
 
@@ -61,9 +62,13 @@ const NftCard = ({ nft }: { nft: NFT }) => {
             </span>
             {isListed && (
               <span className="dark:border-jacarta-600 border-jacarta-100 flex items-center whitespace-nowrap rounded-md border py-[2px] px-2 box-border">
-                <img src="/svg/core-icon.svg" alt="" className="w-3 h-3 mr-1" />
+                <img
+                  src={`/images/tokens/${currency}.png`}
+                  alt=""
+                  className="w-3 h-3 mr-1"
+                />
                 <span className="text-green text-sm font-medium tracking-tight">
-                  {ethers.utils.formatEther(price)} CORE
+                  {formatEther(BigInt(price))} {currency}
                 </span>
               </span>
             )}
