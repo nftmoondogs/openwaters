@@ -26,7 +26,7 @@ const Footer = () => {
                 </div>
               </Link>
               <p className="my-6 dark:text-jacarta-300">
-                Love you Bushra ^-^
+                By NFT people, for NFT people
               </p>
 
               {/* <!-- Socials --> */}
