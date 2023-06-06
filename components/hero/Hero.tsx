@@ -22,19 +22,17 @@ const hero = () => {
         <div className="grid items-center h-full gap-4 md:grid-cols-12">
           <div className="flex flex-col items-center justify-center h-full col-span-6 py-10 md:items-start md:py-20 xl:col-span-4">
             <h1 className="mb-6 text-5xl font-bold text-center text-jacarta-700 font-display dark:text-white md:text-left lg:text-6xl xl:text-7xl">
-              Buy, sell and collect NFTs.
+              Claim your NFT Airdrop
             </h1>
             <p className="mb-8 text-lg text-center dark:text-jacarta-200 md:text-left leading-8">
-              OpenWaters, the best NFT marketplace on CoreDAO Blockchain! Enjoy
-              lightning-fast updates, minimal gas fees, and insightful
-              analytics.
+              If you list any of your NFTs on OpenWaters NFT Marketplace during the month of June then you can claim a free OpenWaters Origin NFT 
             </p>
             <div className="flex space-x-4">
-              <Link href="/collection">
+              <Link href="https://openwatersorigin.openwaters.uk/">
                 <div
                   className={`px-8 py-3 font-semibold text-center text-white transition-all rounded-full bg-accent shadow-accent-volume hover:bg-accent-dark cursor-pointer`}
                 >
-                  Explore
+                  Mint
                 </div>
               </Link>
             </div>
