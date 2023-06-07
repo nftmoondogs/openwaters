@@ -25,12 +25,19 @@ const hero = () => {
               Claim your NFT Airdrop
             </h1>
             <p className="mb-8 text-lg text-center dark:text-jacarta-200 md:text-left leading-8">
-              If you are among the top 10000 participants with the most entry points on our <a href="https://gleam.io/mQE8L/openwaters-origin-nft-giveaway">Giveaway</a> then you are whitelisted to mint a OpenWaters Origin NFT for free
+              You can participate in our giveaway contest to get a whitelist spot for minting OpenWaters Origin NFT for free, If you already won a whitelist spot then you can simply mint your NFT by pressing the mint button
             </p>
             <div className="flex space-x-4">
-              <Link href="https://openwatersorigin.openwaters.uk/">
+            <Link href="https://gleam.io/mQE8L/openwaters-origin-nft-giveaway">
                 <div
                   className={`px-8 py-3 font-semibold text-center text-white transition-all rounded-full bg-accent shadow-accent-volume hover:bg-accent-dark cursor-pointer`}
+                >
+                  Participate
+                </div>
+              </Link>
+              <Link href="https://openwatersorigin.openwaters.uk/">
+                <div
+                  className={`px-8 py-3 font-semibold text-center text-accent transition-all rounded-full bg-white shadow-accent-volume hover:bg-white-dark cursor-pointer`}
                 >
                   Mint
                 </div>
