@@ -43,7 +43,7 @@ export const Header = () => {
             <div>
               <img
                 src={`/images/logo_light.png`}
-                alt="Moondogs | NFT Marketplace"
+                alt="OpenWaters | NFT Marketplace"
                 className="h-[40px] cursor-pointer dark:hidden"
               />
               <img
