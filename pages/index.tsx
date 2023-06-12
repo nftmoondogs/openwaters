@@ -25,7 +25,7 @@ export default function Home() {
     {
       title: "OpenWaters Origin",
       description:
-        "Limited NFTs only for the OG believers of OpenWaters NFT Marketplace",
+        "Limited NFTs for the OG Supporters of OpenWaters NFT Marketplace",
       imageUrl:
         "https://i.ibb.co/vPGDnr8/image.gif",
       pageUrl: "https://openwatersorigin.openwaters.uk/",
