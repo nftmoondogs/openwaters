@@ -40,10 +40,10 @@ export const Header = () => {
       <header className="fixed top-0 z-20 w-full transition-colors js-page-header backdrop-blur">
         <div className="flex items-center justify-between px-6 py-6 xl:px-24">
           <Link className="shrink-0" href="/">
-            <div>
+            <div className="shrink-0">
               <img
                 src={`/images/logo_light.png`}
-                alt="OpenWaters | NFT Marketplace"
+                alt="Moondogs | NFT Marketplace"
                 className="h-[40px] cursor-pointer dark:hidden"
               />
               <img
@@ -121,7 +121,7 @@ export const Header = () => {
 
             {/* End header right content (metamask and other) for desktop */}
           </div>
-          <div className="items-center ml-8 flex xl:ml-12">
+          <div className="items-center flex xl:ml-12">
             <WalletButton />
             {/* End metamask Wallet */}
 

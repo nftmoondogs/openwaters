@@ -12,7 +12,9 @@ const User_items = ({ userAddress }: { userAddress: string }) => {
   const [itemActive, setItemActive] = useState(1);
   const [userNfts, setUserNfts] = useState<NFT[]>([]);
   const [nftCount, setNftCount] = useState<number>(0);
-  const [userCollections, setUserCollections] = useState<Collection[]>([]);
+  const [userCollections, setUserCollections] = useState<GetCollectionResponse>(
+    { collections: [], count: 0, volumes: [], floorPrices: [] }
+  );
   const [collectionCount, setCollectionCount] = useState<number>(0);
 
   const fetchMoreNfts = async () => {
@@ -23,22 +25,23 @@ const User_items = ({ userAddress }: { userAddress: string }) => {
           setUserNfts(userNfts.concat(res.nfts));
         }
       }
-    } catch (error) {
-    }
+    } catch (error) {}
   };
   const fetchMoreCollections = async () => {
     try {
       if (userAddress) {
         const res = await apiGetOwnedCollections(
           userAddress,
-          userCollections.length
+          userCollections.collections.length
         );
         if (res) {
-          setUserCollections(userCollections.concat(res.collections));
+          setUserCollections({
+            ...userCollections,
+            collections: userCollections.collections.concat(res.collections),
+          });
         }
       }
-    } catch (error) {
-    }
+    } catch (error) {}
   };
   useEffect(() => {
     (async () => {
@@ -50,8 +53,7 @@ const User_items = ({ userAddress }: { userAddress: string }) => {
             setNftCount(res.count);
           }
         }
-      } catch (error) {
-      }
+      } catch (error) {}
     })();
   }, [userAddress]);
 
@@ -61,12 +63,11 @@ const User_items = ({ userAddress }: { userAddress: string }) => {
         if (userAddress) {
           const res = await apiGetOwnedCollections(userAddress);
           if (res) {
-            setUserCollections(res.collections);
+            setUserCollections(res);
             setCollectionCount(res.count);
           }
         }
-      } catch (error) {
-      }
+      } catch (error) {}
     })();
   }, [userAddress]);
 
@@ -174,19 +175,25 @@ const User_items = ({ userAddress }: { userAddress: string }) => {
             <TabPanel>
               {/* <!-- Grid --> */}
               <InfiniteScroll
-                dataLength={userCollections.length}
+                dataLength={userCollections.collections.length}
                 loader={
                   <p className="text-center text-lg font-bold p-6">
                     Loading...
                   </p>
                 }
                 next={fetchMoreCollections}
-                hasMore={userCollections.length < collectionCount}
+                hasMore={userCollections.collections.length < collectionCount}
               >
-                <div className="grid grid-cols-2 gap-1 md:gap-[30px] md:grid-cols-3 lg:grid-cols-4">
-                  {userCollections.map((collection, index) => {
+                <div className="grid grid-cols-1">
+                  {userCollections.collections.map((collection, index) => {
                     return (
-                      <CollectionCard collection={collection} key={index} />
+                      <CollectionCard
+                        collection={collection}
+                        key={index}
+                        floorPrice={userCollections.floorPrices[index]}
+                        volumes={userCollections.volumes[index]}
+                        rank={index}
+                      />
                     );
                   })}
                 </div>

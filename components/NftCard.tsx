@@ -68,7 +68,7 @@ const NftCard = ({ nft }: { nft: NFT }) => {
                   className="w-3 h-3 mr-1"
                 />
                 <span className="text-green text-sm font-medium tracking-tight">
-                  {formatEther(BigInt(price))} {currency}
+                  {formatEther(BigInt(price ?? "0"))} {currency}
                 </span>
               </span>
             )}

@@ -17,13 +17,19 @@ import Meta from "../../../components/Meta";
 import NftCard from "../../../components/NftCard";
 import Activity_tab from "../../../components/tabs/Activity_tab";
 import { CDN_URL, EXPLORER_URL } from "../../../config/env";
+import { formatEther } from "viem";
 
 const Collection = () => {
   const router = useRouter();
   const { collection } = router.query;
   const [collectionNfts, setCollectionNfts] = useState<NFT[]>([]);
   const [nftsCount, setNftsCount] = useState<number>(0);
-  const [collectionInfo, setCollectionInfo] = useState<any>({});
+  const [collectionInfo, setCollectionInfo] = useState<GetCollectionResponse>({
+    collections: [],
+    count: 0,
+    floorPrices: [],
+    volumes: [],
+  });
   const [collectionHistory, setCollectionHistory] = useState<Transaction[]>([]);
   const [historyCount, setHistoryCount] = useState<number>(0);
   const userAccount = useAppSelector((state) => state.user);
@@ -70,7 +76,8 @@ const Collection = () => {
         if (collection) {
           const res = await apiGetCollection(collection as string);
           if (res) {
-            setCollectionInfo(res.collections[0]);
+            console.log(res);
+            setCollectionInfo(res);
           }
         }
       } catch (error) {}
@@ -109,7 +116,7 @@ const Collection = () => {
     <div>
       <Meta
         title={`${
-          collectionInfo?.name || "Collection"
+          collectionInfo?.collections?.[0]?.name || "Collection"
         } || Moondogs | NFT Marketplace`}
       />
 
@@ -118,8 +125,8 @@ const Collection = () => {
         <div className="relative h-[300px]">
           <img
             src={
-              collectionInfo?.bannerImage
-                ? `${CDN_URL}/${collectionInfo.bannerImage}`
+              collectionInfo?.collections?.[0]?.bannerImage
+                ? `${CDN_URL}/${collectionInfo?.collections?.[0]?.bannerImage}`
                 : "/images/default/collection_banner_default.png"
             }
             alt="banner"
@@ -135,18 +142,18 @@ const Collection = () => {
               <div className="relative">
                 <img
                   src={
-                    collectionInfo?.profileImage
-                      ? `${CDN_URL}/${collectionInfo.profileImage}`
+                    collectionInfo?.collections?.[0]?.profileImage
+                      ? `${CDN_URL}/${collectionInfo?.collections?.[0]?.profileImage}`
                       : "/images/default/collection_avatar_default.png"
                   }
-                  alt={collectionInfo?.name}
+                  alt={collectionInfo?.collections?.[0]?.name}
                   className="dark:border-jacarta-600 border-[5px] border-white rounded-xl object-cover bg-white"
                 />
-                {collectionInfo?.profileImage ? (
+                {collectionInfo?.collections?.[0]?.profileImage ? (
                   <></>
                 ) : (
                   <p className="absolute top-1/2 -translate-y-1/2 w-full text-center px-3 break-words text-xl text-jacarta-700 font-bold">
-                    {collectionInfo?.name || "Unnamed"}
+                    {collectionInfo?.collections?.[0]?.name || "Unnamed"}
                   </p>
                 )}
               </div>
@@ -154,7 +161,7 @@ const Collection = () => {
                 className="absolute bottom-0 flex items-center justify-center w-6 h-6 border-2 border-white rounded-full dark:border-jacarta-600 bg-green -right-3"
                 data-tippy-content="Verified Collection"
               >
-                {collectionInfo?.verified && (
+                {collectionInfo?.collections?.[0]?.verified && (
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 24 24"
@@ -173,16 +180,20 @@ const Collection = () => {
           <div className="container">
             <div className="text-center">
               <h2 className="mb-2 text-4xl font-medium font-display text-jacarta-700 dark:text-white">
-                {collectionInfo?.name}
+                {collectionInfo?.collections?.[0]?.name}
               </h2>
               <div className="mb-8">
                 <span className="text-sm font-bold text-jacarta-400">
                   Created by{" "}
                 </span>
-                <Link href={`/profile/${collectionInfo?.creator?.address}`}>
+                <Link
+                  href={`/profile/${collectionInfo?.collections?.[0]?.creator?.address}`}
+                >
                   <p className="hover:text-accent-dark font-bold cursor-pointer w-fit mx-auto">
-                    {collectionInfo?.creator?.name ||
-                      shortenAddress(collectionInfo?.creator?.address)}
+                    {collectionInfo?.collections?.[0]?.creator?.name ||
+                      shortenAddress(
+                        collectionInfo?.collections?.[0]?.creator?.address
+                      )}
                   </p>
                 </Link>
               </div>
@@ -204,14 +215,14 @@ const Collection = () => {
                     href={
                       EXPLORER_URL +
                       "/address/" +
-                      collectionInfo?.address +
+                      collectionInfo?.collections?.[0]?.address +
                       "#code"
                     }
                     target="_blank"
                     rel="noreferrer"
                     className="font-medium tracking-tight cursor-pointer text-accent text-2xs"
                   >
-                    {shortenAddress(collectionInfo?.address)}
+                    {shortenAddress(collectionInfo?.collections?.[0]?.address)}
                   </a>
                 </div>
                 <div className="w-1/2 py-4 border-r dark:border-jacarta-600 border-jacarta-100 rounded-l-xl hover:shadow-md sm:w-32">
@@ -219,7 +230,7 @@ const Collection = () => {
                     Royalty Fee
                   </div>
                   <div className="font-medium tracking-tight text-2xs dark:text-jacarta-400">
-                    {collectionInfo?.royalty} %
+                    {collectionInfo?.collections?.[0]?.royalty} %
                   </div>
                 </div>
                 <div className="w-1/2 py-4 border-r dark:border-jacarta-600 border-jacarta-100 rounded-l-xl hover:shadow-md sm:w-32">
@@ -227,18 +238,44 @@ const Collection = () => {
                     Total volume
                   </div>
                   <div className="font-medium tracking-tight text-2xs dark:text-jacarta-400">
-                    {collectionInfo?.volume} Core
+                    {collectionInfo?.collections?.[0]?.volume?.toLocaleString(
+                      "en-us",
+                      {
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 2,
+                      }
+                    )}{" "}
+                    Core
+                  </div>
+                </div>
+                <div className="w-1/2 py-4 rounded-l-xl hover:shadow-md sm:w-32">
+                  <div className="mb-1 text-base font-bold text-jacarta-700 dark:text-white">
+                    Floor Price
+                  </div>
+                  <div className="font-medium tracking-tight text-2xs dark:text-jacarta-400">
+                    {Number(
+                      formatEther(
+                        BigInt(collectionInfo?.floorPrices?.[0] ?? "0")
+                      )
+                    ).toLocaleString("en-us", {
+                      minimumFractionDigits: 0,
+                      maximumFractionDigits: 2,
+                    })}{" "}
+                    Core
                   </div>
                 </div>
               </div>
-              {collectionInfo?.bio ? (
+              {collectionInfo?.collections?.[0]?.bio ? (
                 <p className="max-w-xl mx-auto my-3 text-lg dark:text-jacarta-300">
-                  {collectionInfo?.bio}
+                  {collectionInfo?.collections?.[0]?.bio}
                 </p>
               ) : (
                 <></>
               )}
-              {isCreator(collectionInfo, userAccount.address) && (
+              {isCreator(
+                collectionInfo?.collections?.[0],
+                userAccount.address
+              ) && (
                 <div className="flex items-center justify-center mb-6">
                   <Link href={`/collection/${collection}/edit`}>
                     <span className="cursor-pointer p-2 bg-white flex items-center justify-center border rounded">

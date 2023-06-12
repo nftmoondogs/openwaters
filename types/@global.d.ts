@@ -142,6 +142,8 @@ type UserUpdateData = {
 type GetCollectionResponse = {
   collections: Collection[];
   count: number;
+  floorPrices: string[];
+  volumes: { volume_24: string; volume_48: string }[];
 };
 
 type CollectionUpdateData = {

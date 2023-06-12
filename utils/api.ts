@@ -1,3 +1,5 @@
+import { useAppSelector } from "../redux/store";
+
 import api from "../lib/axios";
 import { SERVER_API } from "../config/env";
 
@@ -128,7 +130,7 @@ export const apiGetOwnedCollections = async (
   }
 };
 
-export const apiGetTopCollections = async (offset = 0, limit = 12) => {
+export const apiGetTopCollections = async (offset = 0, limit = 20) => {
   const url = `${apiUrl}/collection/hot?take=${limit}&skip=${offset}`;
   try {
     const res = await apiGetResponse<Collection[]>(url);
@@ -138,8 +140,12 @@ export const apiGetTopCollections = async (offset = 0, limit = 12) => {
   }
 };
 
-export const apiGetAllCollections = async (offset = 0, limit = 12) => {
-  const url = `${apiUrl}/collection/all?take=${limit}&skip=${offset}`;
+export const apiGetAllCollections = async (
+  woofPrice: number,
+  offset = 0,
+  limit = 20
+) => {
+  const url = `${apiUrl}/collection/all?take=${limit}&skip=${offset}&woofPrice=${woofPrice}`;
   try {
     const res = await apiGetResponse<GetCollectionResponse>(url);
     return res;
@@ -342,5 +348,15 @@ export const apiOfferNft = async (body: {
     return res;
   } catch (error: any) {
     throw new Error(error);
+  }
+};
+
+export const apiGetTokenPrice = async (tokenAddress: string) => {
+  const url = `https://api.geckoterminal.com/api/v2/networks/core/tokens/${tokenAddress}/pools`;
+  try {
+    const res: any = await apiGetResponse(url);
+    return res.data?.[0]?.attributes.base_token_price_native_currency;
+  } catch (error) {
+    console.log(error);
   }
 };

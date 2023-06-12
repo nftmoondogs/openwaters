@@ -1,70 +1,111 @@
 import Link from "next/link";
+import { formatEther } from "viem";
 
-import { shortenAddress } from "../utils";
+import { calcPercent } from "../utils";
 import { CDN_URL } from "../config/env";
 
-const CollectionCard = ({ collection }: { collection: Collection }) => {
-  const { id, address, profileImage, creator, name, totalSupply } = collection;
+const CollectionCard = ({
+  collection,
+  floorPrice,
+  volumes,
+  rank,
+}: {
+  collection: Collection;
+  floorPrice: string;
+  volumes: { volume_24: string; volume_48: string };
+  rank: number;
+}) => {
+  const { id, address, profileImage, creator, name, totalSupply, volume } =
+    collection;
   return (
     <article key={id}>
       <Link href={`/collection/${address}`}>
-        <div className="cursor-pointer overflow-hidden dark:bg-jacarta-700 dark:border-jacarta-700 border-jacarta-100 rounded-2xl border bg-white p-3 transition-shadow hover:shadow-lg">
-          <div className="w-full relative mb-3 overflow-hidden">
+        <div className="flex flex-row items-center gap-6 border-b-[1px] py-4 px-2 md:px-6 text-base cursor-pointer hover:bg-jacarta-100 dark:hover:bg-jacarta-600 font-semibold">
+          <p className="hidden flex-shrink-0 text-center text-gray-400 md:block md:w-[2%]">
+            {rank + 1}
+          </p>
+          <div className="flex-shrink-0">
             <img
               src={
                 profileImage
                   ? `${CDN_URL}/${profileImage}`
                   : "/images/default/collection_avatar_default.png"
               }
-              alt="item 1"
-              className="h-full w-full rounded-[0.625rem] object-cover"
-              loading="lazy"
+              className="h-10 w-10 rounded-full border-[1px] border-gray-200 bg-gray-200 object-cover text-gray-400 dark:border-stone-800 md:h-16 md:w-16"
             />
-            {profileImage ? (
-              <></>
-            ) : (
-              <p className="absolute top-1/2 -translate-y-1/2 w-full text-center px-3 break-words text-lg md:text-xl text-jacarta-700 font-bold">
-                {name || "Unnamed"}
-              </p>
-            )}
           </div>
-          <div className="flex flex-col md:flex-row gap-2 items-center justify-between w-full wrap-">
-            <div className="overflow-x-hidden">
-              <p className="mb-2 text-sm md:text-base text-center md:text-start font-display text-jacarta-700 dark:text-white break-words truncate overflow-hidden">
-                {name || "Unnamed"}
+          <p className="max-w-[128px] overflow-hidden text-ellipsis whitespace-nowrap sm:text-sm md:max-w-[230px] md:overflow-clip md:text-[20px]">
+            {name}
+          </p>
+          <div className="grow"></div>
+          <div className="hidden flex-shrink-0 flex-col gap-2 text-center text-xs md:flex md:w-[12%]">
+            <p className="whitespace-nowrap text-jacarta-300">
+              Volume (24 hours)
+            </p>
+            <p
+              className={`${
+                calcPercent(
+                  volumes?.volume_24 ?? 0,
+                  volumes?.volume_48 ?? 0
+                ) === "--"
+                  ? ""
+                  : Number(volumes?.volume_24) > Number(volumes?.volume_48)
+                  ? "text-[#22c55e]"
+                  : "text-[#ef4444]"
+              } `}
+            >
+              {calcPercent(volumes?.volume_24 ?? 0, volumes?.volume_48 ?? 0) ===
+              Infinity
+                ? "+∞"
+                : calcPercent(
+                    volumes?.volume_24 ?? 0,
+                    volumes?.volume_48 ?? 0
+                  )}{" "}
+              %
+            </p>
+            <div className="flex gap-2 justify-center items-center">
+              <img src="/images/tokens/CORE.png" className="w-4" />
+              <p className="">
+                {Number(volumes?.volume_24).toLocaleString("en-us", {
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 2,
+                })}
               </p>
-              <div className="text-sm font-medium tracking-tight">
-                <div className="flex flex-wrap items-center justify-center md:justify-start">
-                  <div className="flex gap-1">
-                    <span className="dark:text-jacarta-400">by</span>
-                    <Link href={`/profile/${creator?.address}`}>
-                      <div className="flex items-center gap-1 cursor-pointer">
-                        <img
-                          src={
-                            creator?.profileImage
-                              ? `${CDN_URL}/${creator.profileImage}`
-                              : "/images/default/profile_avatar_default.png"
-                          }
-                          alt="owner"
-                          className="w-5 h-5 rounded-full object-cover"
-                        />
-                        <p className="hover:text-accent-dark font-bold">
-                          {creator?.name || shortenAddress(creator?.address)}
-                        </p>
-                      </div>
-                    </Link>
-                  </div>
-                </div>
-              </div>
             </div>
-            <div className="flex items-center gap-2 md:block h-full">
-              <p className="block text-sm font-display text-jacarta-700 dark:text-white text-right">
-                Items
-              </p>
-              <p className="block text-sm font-display text-jacarta-700 dark:text-white text-right">
-                {totalSupply}
+          </div>
+          <div className="hidden md:flex flex-col flex-shrink-0 gap-2 text-xs w-[8%] justify-center">
+            <p className="whitespace-nowrap text-jacarta-300 text-center">
+              Total Volume
+            </p>
+            <div className="flex gap-2 justify-center items-center">
+              <img src="/images/tokens/CORE.png" className="w-4" />
+              <p className="">
+                {volume.toLocaleString("en-us", {
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 2,
+                })}
               </p>
             </div>
+          </div>
+          <div className="w-[30%] flex-shrink-0 flex-col items-center gap-2 text-center text-xs flex md:w-[10%]">
+            <p className="text-jacarta-300">Floor Price</p>
+            <div className="flex gap-2 justify-center items-center">
+              <img src="/images/tokens/CORE.png" className="w-4" />
+              <p className="">
+                {Number(formatEther(BigInt(floorPrice || "0"))) === 0
+                  ? "--"
+                  : Number(
+                      formatEther(BigInt(floorPrice || "0"))
+                    ).toLocaleString("en-us", {
+                      minimumFractionDigits: 0,
+                      maximumFractionDigits: 2,
+                    })}
+              </p>
+            </div>
+          </div>
+          <div className="hidden w-[8%] flex-shrink-0 flex-col items-center gap-2 text-center text-xs md:flex md:w-[10%]">
+            <p className="text-jacarta-300">Items</p>
+            <p className="">{totalSupply}</p>
           </div>
         </div>
       </Link>

@@ -115,7 +115,7 @@ const Item = () => {
       );
       setTimeout(() => {
         window.location.reload();
-      }, 1000);
+      }, 2000);
       setIsLoading(false);
     } catch (error: any) {
       console.log(error);

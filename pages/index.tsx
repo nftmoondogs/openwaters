@@ -1,19 +1,36 @@
 import React, { useContext, useEffect, useState } from "react";
 
-import { apiGetHotNfts, apiGetTopCollections } from "../utils/api";
+import { apiGetAllCollections, apiGetHotNfts } from "../utils/api";
 
 import UserContext from "../components/UserContext";
 import Meta from "../components/Meta";
 import HeadLine from "../components/headLine";
 import Hero from "../components/hero/Hero";
 import HotNftCarousel from "../components/carousel/Hot_Nft_Carousel";
-import Top_collection from "../components/collections/top_collection";
+import LaunchpadCarousel from "../components/carousel/LaunchpadCarousel";
+import TrendingCollections from "../components/collections/TrendingCollections";
+import { useAppSelector } from "../redux/store";
 
 export default function Home() {
   const { scrollRef } = useContext(UserContext);
+  const tokenPrice = useAppSelector((state) => state.tokenPrice);
   const [hotNfts, setHotNfts] = useState<NFT[]>([]);
-  const [topCollections, setTopCollections] = useState<Collection[]>([]);
-
+  const [topCollections, setTopCollections] = useState<GetCollectionResponse>({
+    collections: [],
+    count: 0,
+    floorPrices: [],
+    volumes: [],
+  });
+  const launchpadItems = [
+    {
+      title: "OpenWaters Origin",
+      description:
+        "Limited NFTs only for the OG believers of OpenWaters NFT Marketplace",
+      imageUrl:
+        "https://i.ibb.co/vPGDnr8/image.gif",
+      pageUrl: "https://openwatersorigin.openwaters.uk/",
+    },
+  ];
   useEffect(() => {
     window.scrollTo(0, scrollRef.current.scrollPos);
     const handleScrollPos = () => {
@@ -37,17 +54,19 @@ export default function Home() {
   useEffect(() => {
     (async () => {
       try {
-        const res = await apiGetTopCollections();
+        if (tokenPrice.woofPrice === 0) return;
+        const res = await apiGetAllCollections(tokenPrice.woofPrice);
         setTopCollections(res);
       } catch (error) {}
     })();
-  }, []);
+  }, [tokenPrice.woofPrice]);
 
   return (
     <main>
       <Meta title="Home" />
-      <Hero />
-      {hotNfts.length > 0 ? (
+      {/* <Hero /> */}
+      <LaunchpadCarousel items={launchpadItems} />
+      {/* {hotNfts.length > 0 ? (
         <div className="container">
           <HeadLine
             text="Hot NFTs"
@@ -59,8 +78,8 @@ export default function Home() {
         </div>
       ) : (
         <></>
-      )}
-      <Top_collection collections={topCollections} />
+      )} */}
+      <TrendingCollections collections={topCollections} />
     </main>
   );
 }

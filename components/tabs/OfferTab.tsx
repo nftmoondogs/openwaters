@@ -91,8 +91,10 @@ const OfferTab = ({
         price,
         MARKETPLACE_CONTRACT_ADDRESS
       );
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
       setIsLoading(false);
-      window.location.reload();
     } catch (error: any) {
       setIsLoading(false);
     }

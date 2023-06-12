@@ -111,7 +111,7 @@ export const parseMetadata = (metadata: string) => {
 };
 
 export enum EventType {
-  OFFER_MADE = 'OfferMade',
+  OFFER_MADE = "OfferMade",
 }
 
 export const formatActivity = (eventType: string): string => {
@@ -131,4 +131,15 @@ export const formatActivity = (eventType: string): string => {
     default:
       return "Transfer";
   }
+};
+
+export const calcPercent = (
+  val_24: number | string,
+  val_48: number | string
+) => {
+  return Number.isNaN(
+    ((Number(val_24) - Number(val_48)) / Number(val_48)) * 100
+  )
+    ? "--"
+    : ((Number(val_24) - Number(val_48)) / Number(val_48)) * 100;
 };

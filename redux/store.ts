@@ -4,7 +4,8 @@ import counterReducer from "./counterSlice";
 import modalReducer from "./modalSlice";
 import userReducer from "./userSlice";
 import nftReducer from "./nftSlice";
-import collectionReducer from "./collectionSlice"
+import collectionReducer from "./collectionSlice";
+import tokePriceReducer from "./tokenPriceSlice";
 
 export const store = configureStore({
   reducer: {
@@ -12,7 +13,8 @@ export const store = configureStore({
     modal: modalReducer,
     user: userReducer,
     nft: nftReducer,
-    collection: collectionReducer
+    collection: collectionReducer,
+    tokenPrice: tokePriceReducer,
   },
 });
 

@@ -7,27 +7,37 @@ import { apiGetAllCollections } from "../../utils/api";
 import Meta from "../../components/Meta";
 import HeadLine from "../../components/headLine";
 import CollectionCard from "../../components/CollectionCard";
+import { useAppSelector } from "../../redux/store";
 
 const Explore_collection = () => {
-  const [allCollections, setAllCollecitons] = useState<Collection[]>([]);
+  const [allCollections, setAllCollecitons] = useState<GetCollectionResponse>({
+    collections: [],
+    count: 0,
+    floorPrices: [],
+    volumes: [],
+  });
   const [count, setCount] = useState<number>(0);
-
+  const tokenPrice = useAppSelector((state) => state.tokenPrice);
   const fetchMore = async () => {
     try {
-      const res = await apiGetAllCollections(allCollections.length);
-      setAllCollecitons(allCollections.concat(res.collections));
-    } catch (error) {
-    }
+      const res = await apiGetAllCollections(
+        tokenPrice.woofPrice,
+        allCollections.collections.length
+      );
+      setAllCollecitons({
+        ...allCollections,
+        collections: allCollections.collections.concat(res.collections),
+      });
+    } catch (error) {}
   };
 
   useEffect(() => {
     (async () => {
       try {
-        const res = await apiGetAllCollections();
-        setAllCollecitons(res.collections);
+        const res = await apiGetAllCollections(tokenPrice.woofPrice);
+        setAllCollecitons(res);
         setCount(res.count);
-      } catch (error) {
-      }
+      } catch (error) {}
     })();
   }, []);
 
@@ -54,16 +64,24 @@ const Explore_collection = () => {
           {/* <!-- Grid --> */}
           {allCollections && (
             <InfiniteScroll
-              dataLength={allCollections.length}
+              dataLength={allCollections.collections.length}
               loader={
                 <p className="text-center text-lg font-bold p-6">Loading...</p>
               }
               next={fetchMore}
-              hasMore={allCollections.length < count}
+              hasMore={allCollections.collections.length < count}
             >
-              <div className="grid grid-cols-2 gap-1 md:gap-[30px] md:grid-cols-3 lg:grid-cols-4">
-                {allCollections.map((collection, index) => {
-                  return <CollectionCard collection={collection} key={index} />;
+              <div className="grid grid-cols-1">
+                {allCollections.collections.map((collection, index) => {
+                  return (
+                    <CollectionCard
+                      collection={collection}
+                      floorPrice={allCollections.floorPrices[index]}
+                      volumes={allCollections.volumes[index]}
+                      rank={index}
+                      key={index}
+                    />
+                  );
                 })}
               </div>
             </InfiniteScroll>
