@@ -78,9 +78,14 @@ const TrendingCollections = ({
                           } `}
                         >
                           {calcPercent(
-                            collections?.volumes?.[index]?.volume_24 ?? 0,
-                            collections?.volumes?.[index].volume_48 ?? 0
-                          )}{" "}
+                            collections.volumes?.[index]?.volume_24 ?? 0,
+                            collections.volumes?.[index]?.volume_48 ?? 0
+                          ) === Infinity
+                            ? "+∞"
+                            : calcPercent(
+                                collections.volumes?.[index]?.volume_24 ?? 0,
+                                collections.volumes?.[index]?.volume_48 ?? 0
+                              )}{" "}
                           %
                         </p>
                         <div className="flex gap-2 justify-center items-center">
