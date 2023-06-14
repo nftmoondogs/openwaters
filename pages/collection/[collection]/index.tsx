@@ -199,7 +199,7 @@ const Collection = () => {
               </div>
 
               <div className="inline-flex flex-wrap items-center justify-center mb-8 bg-white border dark:bg-jacarta-800 dark:border-jacarta-600 border-jacarta-100 rounded-xl">
-                <div className="w-1/2 py-4 border-r dark:border-jacarta-600 border-jacarta-100 rounded-l-xl hover:shadow-md sm:w-32">
+                <div className="w-1/2 h-[80px] border-r border-b-[1px] md:border-b-0 dark:border-jacarta-600 border-jacarta-100 flex flex-col items-center justify-center hover:shadow-md md:w-32">
                   <div className="mb-1 text-base font-bold text-jacarta-700 dark:text-white">
                     Total Items
                   </div>
@@ -207,7 +207,7 @@ const Collection = () => {
                     {nftsCount}
                   </div>
                 </div>
-                <div className="w-1/2 py-4 border-r dark:border-jacarta-600 border-jacarta-100 rounded-l-xl hover:shadow-md sm:w-32">
+                <div className="w-1/2 h-[80px] md:border-r border-b-[1px] md:border-b-0 dark:border-jacarta-600 border-jacarta-100 flex flex-col items-center justify-center hover:shadow-md md:w-32">
                   <div className="mb-1 text-base font-bold text-jacarta-700 dark:text-white">
                     Contract
                   </div>
@@ -225,7 +225,7 @@ const Collection = () => {
                     {shortenAddress(collectionInfo?.collections?.[0]?.address)}
                   </a>
                 </div>
-                <div className="w-1/2 py-4 border-r dark:border-jacarta-600 border-jacarta-100 rounded-l-xl hover:shadow-md sm:w-32">
+                <div className="w-1/2 h-[80px] border-r border-b-[1px] md:border-b-0 dark:border-jacarta-600 border-jacarta-100 flex flex-col items-center justify-center hover:shadow-md md:w-32">
                   <div className="mb-1 text-base font-bold text-jacarta-700 dark:text-white">
                     Royalty Fee
                   </div>
@@ -233,7 +233,7 @@ const Collection = () => {
                     {collectionInfo?.collections?.[0]?.royalty} %
                   </div>
                 </div>
-                <div className="w-1/2 py-4 border-r dark:border-jacarta-600 border-jacarta-100 rounded-l-xl hover:shadow-md sm:w-32">
+                <div className="w-1/2 h-[80px] md:border-r border-b-[1px] md:border-b-0 dark:border-jacarta-600 border-jacarta-100 flex flex-col items-center justify-center hover:shadow-md md:w-32">
                   <div className="mb-1 text-base font-bold text-jacarta-700 dark:text-white">
                     Total volume
                   </div>
@@ -248,7 +248,7 @@ const Collection = () => {
                     Core
                   </div>
                 </div>
-                <div className="w-1/2 py-4 rounded-l-xl hover:shadow-md sm:w-32">
+                <div className="w-1/2 h-[80px] flex flex-col items-center justify-center hover:shadow-md sm:w-32">
                   <div className="mb-1 text-base font-bold text-jacarta-700 dark:text-white">
                     Floor Price
                   </div>

@@ -20,7 +20,7 @@ const CollectionCard = ({
   return (
     <article key={id}>
       <Link href={`/collection/${address}`}>
-        <div className="flex flex-row items-center gap-6 border-b-[1px] py-4 px-2 md:px-6 text-base cursor-pointer hover:bg-jacarta-100 dark:hover:bg-jacarta-600 font-semibold">
+        <div className="flex flex-row items-center gap-6 border-b-[1px] border-jacarta-200 dark:border-white/10 py-4 px-2 md:px-6 text-base cursor-pointer hover:bg-jacarta-100 dark:hover:bg-jacarta-600 font-semibold">
           <p className="hidden flex-shrink-0 text-center text-gray-400 md:block md:w-[2%]">
             {rank + 1}
           </p>
@@ -87,7 +87,7 @@ const CollectionCard = ({
               </p>
             </div>
           </div>
-          <div className="w-[30%] flex-shrink-0 flex-col items-center gap-2 text-center text-xs flex md:w-[10%]">
+          <div className="w-[20%] flex-shrink-0 flex-col items-center gap-2 text-center text-xs flex md:w-[10%]">
             <p className="text-jacarta-300">Floor Price</p>
             <div className="flex gap-2 justify-center items-center">
               <img src="/images/tokens/CORE.png" className="w-4" />
@@ -103,7 +103,7 @@ const CollectionCard = ({
               </p>
             </div>
           </div>
-          <div className="hidden w-[8%] flex-shrink-0 flex-col items-center gap-2 text-center text-xs md:flex md:w-[10%]">
+          <div className="hidden flex-shrink-0 flex-col items-center gap-2 text-center text-xs md:flex">
             <p className="text-jacarta-300">Items</p>
             <p className="">{totalSupply}</p>
           </div>

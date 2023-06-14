@@ -447,6 +447,10 @@ html {
 		tab-size: 4;
 	}
 
+	* {
+		box-sizing: border-box;
+	}
+
 	body {
 		line-height: inherit;
 		margin: 0;

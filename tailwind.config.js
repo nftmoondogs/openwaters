@@ -24,6 +24,7 @@ module.exports = {
       transparent: "transparent",
       current: "currentColor",
       white: "#ffffff",
+      black: "#000000",
       accent: "#8358FF",
       "accent-dark": "#7444FF",
       "accent-light": "#9E7CFF",

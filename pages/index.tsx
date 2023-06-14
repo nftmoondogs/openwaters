@@ -30,7 +30,6 @@ export default function Home() {
         "https://i.ibb.co/vPGDnr8/image.gif",
       pageUrl: "https://openwatersorigin.openwaters.uk/",
     },
-
   ];
   useEffect(() => {
     window.scrollTo(0, scrollRef.current.scrollPos);

@@ -27,6 +27,8 @@ const Explore_collection = () => {
       setAllCollecitons({
         ...allCollections,
         collections: allCollections.collections.concat(res.collections),
+        floorPrices: allCollections.floorPrices.concat(res.floorPrices),
+        volumes: allCollections.volumes.concat(res.volumes),
       });
     } catch (error) {}
   };

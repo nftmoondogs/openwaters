@@ -38,6 +38,8 @@ const User_items = ({ userAddress }: { userAddress: string }) => {
           setUserCollections({
             ...userCollections,
             collections: userCollections.collections.concat(res.collections),
+            volumes: userCollections.volumes.concat(res.volumes),
+            floorPrices: userCollections.floorPrices.concat(res.floorPrices),
           });
         }
       }
