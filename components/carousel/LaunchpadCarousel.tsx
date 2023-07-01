@@ -14,6 +14,7 @@ const LaunchpadCarousel = ({
     description: string;
     imageUrl: string;
     pageUrl: string;
+    button: string;
   }[];
 }) => {
   return (
@@ -57,7 +58,7 @@ const LaunchpadCarousel = ({
                       <div
                         className={`px-8 py-3 w-fit font-semibold text-center text-white transition-all rounded-full bg-accent shadow-accent-volume hover:bg-accent-dark cursor-pointer`}
                       >
-                        Mint Now
+                        {item.button}
                       </div>
                     </a>
                   </div>

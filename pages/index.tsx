@@ -23,13 +23,24 @@ export default function Home() {
   });
   const launchpadItems = [
     {
-      type: "hello",
+      type: "Featured Launchpad Project",
       title: "OpenWaters Origin",
       description:
         "Limited NFTs for the OG Supporters of OpenWaters NFT Marketplace",
       imageUrl:
         "https://i.ibb.co/vPGDnr8/image.gif",
       pageUrl: "https://openwatersorigin.openwaters.uk/",
+      button: "Mint Now"
+    },
+    {
+      type: "New NFT Project",
+      title: "BLIZ BIRD CORE",
+      description:
+        "BLIZZARDCorp. NFT Colection consist of different type, Wild, Gold, Dark and etc.",
+      imageUrl:
+        "https://cdn.openwaters.uk/collection-profileImage-0x9Ed88F07E16e2caAb800902cF4c7D82635cdd6A0.png",
+      pageUrl: "https://www.openwaters.uk/collection/0x9Ed88F07E16e2caAb800902cF4c7D82635cdd6A0",
+      button: "Explore"
     },
   ];
   useEffect(() => {
