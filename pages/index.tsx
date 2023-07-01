@@ -23,6 +23,7 @@ export default function Home() {
   });
   const launchpadItems = [
     {
+      type: "hello",
       title: "OpenWaters Origin",
       description:
         "Limited NFTs for the OG Supporters of OpenWaters NFT Marketplace",

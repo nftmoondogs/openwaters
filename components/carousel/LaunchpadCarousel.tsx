@@ -9,6 +9,7 @@ const LaunchpadCarousel = ({
   items,
 }: {
   items: {
+    type: string;
     title: string;
     description: string;
     imageUrl: string;
@@ -44,7 +45,7 @@ const LaunchpadCarousel = ({
                 <div className="flex flex-col-reverse sm:flex-row ">
                   <div className="flex flex-col items-center sm:items-start gap-4 sm:w-2/3 sm:pr-4">
                     <div className="bg-accent-dark rounded-[8px] py-2 px-4 w-fit">
-                      Featured Launchpad Project
+                      {item.type}
                     </div>
                     <p className="text-3xl font-bold text-[#000000] dark:text-jacarta-200">
                       {item.title}
