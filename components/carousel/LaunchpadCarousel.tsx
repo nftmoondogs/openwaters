@@ -56,7 +56,7 @@ const LaunchpadCarousel = ({
                     </p>
                     <a href={`${item.pageUrl}`} target="_blank">
                       <div
-                        className={`px-8 py-3 w-fit font-semibold text-center text-white transition-all rounded-full bg-accent shadow-accent-volume hover:bg-accent-dark cursor-pointer`}
+                        className={`px-8 py-3 w-fit font-semibold text-center text-white transition-all rounded-full bg-accent hover:bg-accent-dark cursor-pointer`}
                       >
                         {item.button}
                       </div>
