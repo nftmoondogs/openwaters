@@ -42,6 +42,16 @@ export default function Home() {
       pageUrl: "https://www.openwaters.uk/collection/0x9Ed88F07E16e2caAb800902cF4c7D82635cdd6A0",
       button: "Explore"
     },
+    {
+      type: "Featured NFT Project",
+      title: "Moondogs",
+      description:
+        "Moondogs is a collection of 5555 NFTs, accelerating Web3 innovation through IP utilization and community empowerment.",
+      imageUrl:
+        "https://cdn.openwaters.uk/collection-profileImage-0x302330B329191324fE83Fa6461A48F2e22406c9D.png",
+      pageUrl: "https://www.openwaters.uk/collection/0x302330B329191324fE83Fa6461A48F2e22406c9D",
+      button: "Explore"
+    },
   ];
   useEffect(() => {
     window.scrollTo(0, scrollRef.current.scrollPos);
